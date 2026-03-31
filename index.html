@@ -112,6 +112,12 @@
     .tree-comment{color:var(--text-label);font-style:italic;margin-left:12px}
     .tree-indent{margin-left:20px}
 
+    /* ROLE SELECTOR */
+    .role-btn{font-family:var(--mono);font-size:0.72rem;padding:8px 14px;border-radius:3px;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim)}
+    .role-btn:hover{border-color:var(--teal-dim);color:var(--text)}
+    .role-btn.active{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
+    .role-btn .role-icon{margin-right:6px}
+
     /* LAUNCH BAR */
     .launch-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
     .launch-bar-text{font-size:0.78rem;color:var(--text-dim);flex:1;min-width:200px;font-weight:300}
@@ -177,6 +183,12 @@
       <div><span class="stat-val">13</span>lessons</div>
     </div>
   </section>
+
+  <!-- ROLE SELECTOR -->
+  <div id="roleSelector" style="margin-bottom:24px">
+    <div class="section-label" style="margin-bottom:12px">Твоя роль в команде</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="roleButtons"></div>
+  </div>
 
   <!-- TAB: TERMINAL -->
   <section class="section active" id="tab-terminal">
@@ -531,6 +543,51 @@ Patterns found:
 
 Add to CLAUDE.md? (y/n)`},
 
+  'AIM-lab-announce': {cat:'Team', desc:'Lab announcements — workshops, materials, reminders', demo:`\x1b[36m━━━ Lab Announce ━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Templates:
+  1. \x1b[36mworkshop\x1b[0m    — анонс воркшопа/сессии
+  2. \x1b[36mmaterials\x1b[0m   — новые материалы доступны
+  3. \x1b[36mreminder\x1b[0m    — напоминание о дедлайне
+  4. \x1b[36mweekly\x1b[0m      — итоги недели
+  5. \x1b[36mcustom\x1b[0m      — произвольное сообщение
+
+Target: AI-Native Sprint s2 chat
+Style: AIM Communication (lowercase, no emoji, en dash)
+
+\x1b[33mSelect template number or describe message:\x1b[0m`},
+
+  'intro': {cat:'Content', desc:'Intro messages for Telegram chats and communities', demo:`\x1b[36m━━━ Intro Generator ━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Adapts format to channel context:
+  • Space — professional, brief
+  • Lab chat — warm, practical
+  • Partner group — formal, concrete
+  • Community — friendly, open
+
+Provide:
+  1. Target channel/chat
+  2. Person info (name, role, background)
+  3. Tone preference
+
+\x1b[33mWho needs an intro and where?\x1b[0m`},
+
+  'AIM-carousel': {cat:'Content', desc:'Instagram carousel/stories generation — 7 styles', demo:`\x1b[36m━━━ AIM Carousel Generator ━━━━━━━━━━━\x1b[0m
+
+Available styles:
+  1. \x1b[36mbrutalist\x1b[0m      — raw, bold, high contrast
+  2. \x1b[36mcollage\x1b[0m        — mixed media, overlapping
+  3. \x1b[36meditorial\x1b[0m      — clean, magazine layout
+  4. \x1b[36mainative-teal\x1b[0m  — AI-Native Sprint brand
+  5. \x1b[36mlab-x26\x1b[0m        — spring lab aesthetic
+  6. \x1b[36mcinema-dark\x1b[0m    — amber + teal cinematic
+  7. \x1b[36mblueprint\x1b[0m      — blue technical drawings
+
+Formats: Stories 1080x1920, Carousel 1080x1350, Banner 1500x500
+Export: 2x retina PNG + MP4
+
+\x1b[33mProvide topic and style number:\x1b[0m`},
+
   'help': {cat:'System', desc:'List all available commands and skills', demo:''}
 };
 
@@ -770,15 +827,20 @@ function initTerminal() {
   });
 
   // Welcome
+  const savedRole = currentRole ? ROLES[currentRole] : null;
   term.writeln('\x1b[36m');
-  term.writeln('  ╭──────────────────────────────────────────╮');
-  term.writeln('  │  \x1b[1mClaude Code Lab\x1b[0m\x1b[36m — AI Mindset            │');
-  term.writeln('  │                                          │');
-  term.writeln('  │  Interactive terminal with real vault     │');
-  term.writeln('  │  structure and working skills.            │');
-  term.writeln('  │                                          │');
-  term.writeln('  │  Type \x1b[1m\x1b[33mhelp\x1b[0m\x1b[36m to start.                     │');
-  term.writeln('  ╰──────────────────────────────────────────╯');
+  term.writeln('  ╭──────────────────────────────────────────────╮');
+  term.writeln('  │  \x1b[1mClaude Code Lab\x1b[0m\x1b[36m — AI Mindset                │');
+  term.writeln('  │                                              │');
+  if (savedRole) {
+    term.writeln(`  │  Role: \x1b[1m${(savedRole.name + ' — ' + savedRole.title).padEnd(37)}\x1b[0m\x1b[36m │`);
+  } else {
+    term.writeln('  │  Select your role above, then type           │');
+  }
+  term.writeln(`  │  \x1b[1m\x1b[33mwalkthrough\x1b[0m\x1b[36m for guided tour                 │`);
+  term.writeln('  │  \x1b[1m\x1b[33mhelp\x1b[0m\x1b[36m for all commands                       │');
+  term.writeln('  │  \x1b[1m\x1b[33mrole\x1b[0m\x1b[36m to change role                         │');
+  term.writeln('  ╰──────────────────────────────────────────────╯');
   term.writeln('\x1b[0m');
 
   prompt();
@@ -1198,6 +1260,99 @@ Next steps:
       return;
     }
 
+    case 'walkthrough': case 'walk': case 'tour': {
+      if (!currentRole) {
+        term.writeln('\x1b[33mВыбери роль сначала:\x1b[0m кликни на роль вверху страницы или введи:');
+        term.writeln('  \x1b[36mrole founder\x1b[0m | \x1b[36mrole operations\x1b[0m | \x1b[36mrole tech\x1b[0m | \x1b[36mrole content\x1b[0m');
+        term.writeln('  \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m | \x1b[36mrole assistant\x1b[0m');
+        prompt();
+        break;
+      }
+      const role = ROLES[currentRole];
+      const steps = role.walkthrough;
+      let stepIdx = 0;
+      term.writeln('');
+      term.writeln(`\x1b[36m━━━ Walkthrough: ${role.name} — ${role.title} ━━━━━━━━━━\x1b[0m`);
+      term.writeln(`\x1b[90m${steps.length} шагов. Каждый покажет скилл в действии.\x1b[0m`);
+      term.writeln('');
+
+      function nextStep() {
+        if (stepIdx >= steps.length) {
+          term.writeln('');
+          term.writeln(`\x1b[32m✓ Walkthrough complete!\x1b[0m`);
+          term.writeln(`\x1b[90mТеперь попробуй эти скиллы сам. Введи /имя-скилла.\x1b[0m`);
+          term.writeln('');
+          prompt();
+          return;
+        }
+        const step = steps[stepIdx];
+        stepIdx++;
+        term.writeln(`\x1b[33m── Step ${stepIdx}/${steps.length}: ${step.text}\x1b[0m`);
+        term.writeln(`\x1b[36m${role.name} $ ${step.cmd}\x1b[0m`);
+        term.writeln('');
+
+        // Execute the command and show output
+        const skillName = step.cmd.startsWith('/') ? step.cmd.slice(1) : null;
+        if (skillName && SKILLS[skillName]) {
+          typeWriter(SKILLS[skillName].demo, () => {
+            term.writeln('');
+            setTimeout(nextStep, 800);
+          });
+        } else if (step.cmd.startsWith('cat ') || step.cmd.startsWith('ls ') || step.cmd.startsWith('tree ')) {
+          // Execute fs command silently
+          const cmdParts = step.cmd.split(/\s+/);
+          const cmdName = cmdParts[0];
+          const cmdArgs = cmdParts.slice(1).join(' ');
+          if (cmdName === 'cat') {
+            const fpath = resolvePath(cmdArgs);
+            if (FS[fpath] && FS[fpath].type === 'file') {
+              term.writeln(FS[fpath].content);
+            }
+          } else if (cmdName === 'ls') {
+            const node = resolveDir(cmdArgs);
+            if (node && node.type === 'dir') {
+              node.children.forEach(c => {
+                term.writeln(`  ${c.endsWith('/') ? '\x1b[36m' : ''}${c}\x1b[0m`);
+              });
+            }
+          }
+          term.writeln('');
+          setTimeout(nextStep, 600);
+        } else {
+          setTimeout(nextStep, 400);
+        }
+      }
+      nextStep();
+      return;
+    }
+
+    case 'role': {
+      if (!args) {
+        if (currentRole) {
+          const r = ROLES[currentRole];
+          term.writeln(`Current role: \x1b[36m${r.name} — ${r.title}\x1b[0m`);
+        } else {
+          term.writeln('No role selected. Available roles:');
+        }
+        Object.entries(ROLES).forEach(([key, r]) => {
+          const marker = currentRole === key ? '\x1b[32m●\x1b[0m' : '\x1b[90m○\x1b[0m';
+          term.writeln(`  ${marker} \x1b[36m${key.padEnd(14)}\x1b[0m ${r.name} — ${r.title}`);
+        });
+        term.writeln('');
+        term.writeln('Usage: \x1b[36mrole <name>\x1b[0m');
+        prompt();
+        break;
+      }
+      const roleKey = args.toLowerCase().trim();
+      if (ROLES[roleKey]) {
+        selectRole(roleKey);
+      } else {
+        term.writeln(`\x1b[31mRole "${args}" not found.\x1b[0m Available: ${Object.keys(ROLES).join(', ')}`);
+        prompt();
+      }
+      break;
+    }
+
     case 'next': {
       const done = [...lessonProgress].length;
       const nextIdx = done < LESSONS.length ? done + 1 : 1;
@@ -1523,6 +1678,152 @@ function renderVaultTree() {
 }
 
 // ============================================================
+// TEAM ROLES — real AIM team
+// ============================================================
+const ROLES = {
+  founder: {
+    name: 'Alex', title: 'Founder & Vision Lead', icon: '◆',
+    desc: 'Стратегия, educational design, partnerships, product vision',
+    skills: ['pos-morning','vox','ceo-council','AIM-pm','research','daily-focus','pos-audit'],
+    walkthrough: [
+      {cmd: '/pos-morning', text: 'Утренний brief — calendar + Linear + sessions + vault'},
+      {cmd: '/vox', text: 'Day advisor — приоритеты и план дня'},
+      {cmd: '/ceo-council', text: 'Strategic analysis — 4 expert perspectives параллельно'},
+      {cmd: '/AIM-pm', text: 'Team dashboard — статус каждого члена команды'},
+      {cmd: '/research', text: 'Deep research — 3 Exa sub-agents параллельно'},
+      {cmd: 'cat CLAUDE.md', text: 'Конституция агента — правила и контекст'},
+    ]
+  },
+  operations: {
+    name: 'Ira', title: 'Operations Partner', icon: '◇',
+    desc: 'Finance, HR, координация, процессы, продажи',
+    skills: ['AIM-pm','calendar','pos-morning','AIM-lab','sessions','linear-action','AIM-meeting-summary'],
+    walkthrough: [
+      {cmd: '/AIM-pm', text: 'Team dashboard — кто что делает, блокеры, overdue'},
+      {cmd: '/calendar', text: 'Calendar — расписание дня и недели'},
+      {cmd: '/AIM-lab', text: 'Lab hub — статус лаборатории, участники, чат'},
+      {cmd: '/linear-action', text: 'Linear actions — update, close, comment задачи'},
+      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — из транскрипта в action items'},
+      {cmd: 'ls ai-mindset-2026/Org/', text: 'Организационная структура — HR, Partners, Processes'},
+    ]
+  },
+  partnerships: {
+    name: 'Vlada', title: 'Partnerships & Growth Lead', icon: '◈',
+    desc: 'Партнёрства, growth, Space, speaker outreach',
+    skills: ['AIM-pm','research','content-voice','calendar','AIM-meeting-summary','daily-focus','linear-action'],
+    walkthrough: [
+      {cmd: '/research', text: 'Research — поиск партнёров и конкурентов через Exa'},
+      {cmd: '/content-voice', text: 'Content voice — вычитка follow-up сообщений партнёрам'},
+      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — после partnership call'},
+      {cmd: '/calendar', text: 'Calendar — расписание встреч'},
+      {cmd: 'ls ai-mindset-2026/Org/Partners/', text: 'CRM папка партнёров'},
+      {cmd: '/daily-focus', text: 'Daily focus — фокус дня в Telegram'},
+    ]
+  },
+  tech: {
+    name: 'Dan', title: 'Tech Lead', icon: '▣',
+    desc: 'LMS, automation, payments, AI agents, infrastructure',
+    skills: ['pos-audit','pos-morning','sessions','linear-action','research','reflect'],
+    walkthrough: [
+      {cmd: '/pos-audit', text: 'POS audit — score инфраструктуры (CLAUDE.md, MCP, hooks)'},
+      {cmd: 'cat .claude/mcp.json', text: 'MCP config — 7 серверов команды'},
+      {cmd: 'ls .claude/skills/', text: 'Все скиллы — 44 глобальных'},
+      {cmd: '/reflect', text: 'Reflect — анализ паттернов, генерация правил'},
+      {cmd: '/sessions', text: 'Sessions — история работы Claude Code'},
+      {cmd: 'tree ~/.claude', text: 'Структура Claude Code config'},
+    ]
+  },
+  content: {
+    name: 'Katya', title: 'Content & Marketing Lead', icon: '◎',
+    desc: 'Контент, reels, stories, карусели, analytics, стиль',
+    skills: ['AIM-carousel','imagine','content-voice','AIM-meeting-summary','daily-focus','infocompressor','research'],
+    walkthrough: [
+      {cmd: '/AIM-carousel', text: 'Carousel generator — 7 стилей, Stories + Posts'},
+      {cmd: '/imagine', text: 'Image generation — 4 модели (Nano Banana, GPT-5, Flux, Seedream)'},
+      {cmd: '/content-voice', text: 'Content voice — проверка текстов на AI-шность'},
+      {cmd: '/infocompressor', text: 'Compress — сжатие текстов 3-5x без потери данных'},
+      {cmd: '/daily-focus', text: 'Daily focus — фокус дня + визуальная метафора'},
+      {cmd: '/research', text: 'Research — поиск контент-идей и трендов'},
+    ]
+  },
+  pm: {
+    name: 'Karina', title: 'Program Coordinator', icon: '◉',
+    desc: 'Sprint launches, speakers, events, сайт, координация',
+    skills: ['AIM-lab','AIM-pm','calendar','linear-action','AIM-meeting-summary','AIM-lab-announce','research'],
+    walkthrough: [
+      {cmd: '/AIM-lab', text: 'Lab hub — чат лаборатории, участники, дайджест'},
+      {cmd: '/AIM-pm', text: 'Team PM — статус задач команды'},
+      {cmd: '/linear-action', text: 'Linear — обновление задач спринта'},
+      {cmd: '/AIM-lab-announce', text: 'Lab announce — анонсы в чат лаборатории'},
+      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — итоги звонков'},
+      {cmd: '/calendar', text: 'Calendar — расписание сессий и дедлайнов'},
+    ]
+  },
+  community: {
+    name: 'Olya', title: 'Community Manager', icon: '○',
+    desc: 'Circle, Space модерация, events, participant support',
+    skills: ['AIM-lab','calendar','AIM-lab-announce','content-voice','daily-focus','intro'],
+    walkthrough: [
+      {cmd: '/AIM-lab', text: 'Lab hub — мониторинг чата, ответы участникам'},
+      {cmd: '/intro', text: 'Intro — генерация intro-сообщений для новых участников'},
+      {cmd: '/AIM-lab-announce', text: 'Lab announce — еженедельные дайджесты'},
+      {cmd: '/content-voice', text: 'Content voice — проверка тона сообщений'},
+      {cmd: '/calendar', text: 'Calendar — расписание community events'},
+      {cmd: '/daily-focus', text: 'Daily focus — фокус на community задачи'},
+    ]
+  },
+  assistant: {
+    name: 'Lena', title: 'Business Assistant', icon: '▫',
+    desc: 'Personal ops, AIM support, speaker communication, admin',
+    skills: ['calendar','pos-morning','AIM-meeting-summary','linear-action','daily-focus','sessions'],
+    walkthrough: [
+      {cmd: '/calendar', text: 'Calendar — расписание Alex и команды'},
+      {cmd: '/pos-morning', text: 'Morning brief — контекст дня'},
+      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — итоги звонков → action items'},
+      {cmd: '/linear-action', text: 'Linear — трекинг задач'},
+      {cmd: '/daily-focus', text: 'Daily focus — планирование дня'},
+      {cmd: '/sessions', text: 'Sessions — последние сессии Claude Code'},
+    ]
+  }
+};
+
+let currentRole = localStorage.getItem('cclab-role') || null;
+
+function renderRoles() {
+  const container = document.getElementById('roleButtons');
+  let html = '';
+  Object.entries(ROLES).forEach(([key, r]) => {
+    const active = currentRole === key ? ' active' : '';
+    html += `<div class="role-btn${active}" onclick="selectRole('${key}')"><span class="role-icon">${r.icon}</span>${r.name} — ${r.title}</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function selectRole(key) {
+  currentRole = key;
+  localStorage.setItem('cclab-role', key);
+  renderRoles();
+  const r = ROLES[key];
+  // Show welcome in terminal
+  switchTab('terminal');
+  setTimeout(() => {
+    term.writeln('');
+    term.writeln(`\x1b[36m━━━ Role: ${r.name} — ${r.title} ━━━━━━━━━━━━\x1b[0m`);
+    term.writeln(`\x1b[90m${r.desc}\x1b[0m`);
+    term.writeln('');
+    term.writeln(`\x1b[33mРекомендованные скиллы:\x1b[0m`);
+    r.skills.forEach(s => {
+      const sk = SKILLS[s];
+      if (sk) term.writeln(`  \x1b[36m/${s.padEnd(24)}\x1b[0m \x1b[90m${sk.desc.slice(0,50)}\x1b[0m`);
+    });
+    term.writeln('');
+    term.writeln(`Введи \x1b[33mwalkthrough\x1b[0m для guided tour по твоим скиллам.`);
+    term.writeln('');
+    prompt();
+  }, 100);
+}
+
+// ============================================================
 // PROGRESS & ONBOARDING
 // ============================================================
 function updateProgress() {
@@ -1576,6 +1877,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLessons();
   renderSkills();
   renderVaultTree();
+  renderRoles();
   updateProgress();
 
   // Show onboarding hint after terminal is ready
