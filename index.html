@@ -112,6 +112,25 @@
     .tree-comment{color:var(--text-label);font-style:italic;margin-left:12px}
     .tree-indent{margin-left:20px}
 
+    /* LAUNCH BAR */
+    .launch-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .launch-bar-text{font-size:0.78rem;color:var(--text-dim);flex:1;min-width:200px;font-weight:300}
+    .launch-bar-text strong{color:var(--text);font-weight:500}
+    .launch-btn{font-family:var(--mono);font-size:0.72rem;padding:8px 16px;border-radius:3px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;border:1px solid}
+    .launch-btn-primary{color:var(--bg);background:var(--teal);border-color:var(--teal)}
+    .launch-btn-primary:hover{background:#5dd5e0}
+    .launch-btn-secondary{color:var(--teal);background:transparent;border-color:var(--teal-dim)}
+    .launch-btn-secondary:hover{background:var(--teal-dim)}
+    .launch-btn-gh{color:var(--text);background:transparent;border-color:var(--border)}
+    .launch-btn-gh:hover{border-color:var(--text-dim)}
+
+    /* ONBOARDING OVERLAY */
+    .onboard-hint{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:1px solid var(--teal-dim);border-radius:6px;padding:12px 16px;font-size:0.72rem;color:var(--text-dim);max-width:280px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:none}
+    .onboard-hint.visible{display:block;animation:fadeInUp .3s ease}
+    .onboard-hint .hint-cmd{color:var(--teal);font-weight:600}
+    .onboard-hint .hint-close{position:absolute;top:8px;right:10px;cursor:pointer;color:var(--text-label);font-size:0.8rem}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
     /* FOOTER */
     .site-footer{padding:24px 0;border-top:1px solid var(--border);text-align:center;font-size:0.6rem;color:var(--text-label);letter-spacing:1px}
 
@@ -170,6 +189,14 @@
         <span class="term-size" id="termSize"></span>
       </div>
       <div class="term-body term-body-large" id="mainTerminal"></div>
+    </div>
+    <div class="launch-bar">
+      <div class="launch-bar-text">
+        <strong>Попробуй в реальном терминале:</strong> клонируй репо и работай в настоящем Claude Code
+      </div>
+      <a class="launch-btn launch-btn-primary" onclick="runInTerminal('git clone https://github.com/aPoWall/aim-claude-code-lab && cd aim-claude-code-lab')">Clone &amp; Run</a>
+      <a class="launch-btn launch-btn-secondary" href="https://github.com/aPoWall/aim-claude-code-lab" target="_blank">GitHub</a>
+      <a class="launch-btn launch-btn-gh" onclick="runInTerminal('setup')">Setup Guide</a>
     </div>
   </section>
 
@@ -684,6 +711,15 @@ Ambient layers строятся на hooks:
 // XTERM TERMINAL
 // ============================================================
 let term, fitAddon, cwd = '~', cmdBuffer = '', historyArr = [], historyIdx = -1;
+let lessonProgress = new Set(JSON.parse(localStorage.getItem('cclab-done') || '[]'));
+let onboardStep = parseInt(localStorage.getItem('cclab-onboard') || '0');
+const ONBOARD_HINTS = [
+  {cmd: 'help', hint: 'Начни с \x1b[33mhelp\x1b[0m — покажет все команды'},
+  {cmd: 'ls', hint: 'Теперь \x1b[33mls\x1b[0m — увидишь структуру vault'},
+  {cmd: 'ls .claude/skills/', hint: 'Попробуй \x1b[33mls .claude/skills/\x1b[0m — 44 скилла'},
+  {cmd: '/pos-audit', hint: 'Запусти скилл: \x1b[33m/pos-audit\x1b[0m'},
+  {cmd: 'lesson 1', hint: 'Открой первый урок: \x1b[33mlesson 1\x1b[0m'},
+];
 
 function initTerminal() {
   term = new window.Terminal({
@@ -888,6 +924,11 @@ function executeCommand(raw) {
   const cmd = parts[0];
   const args = parts.slice(1).join(' ');
 
+  // Advance onboarding on any recognized command
+  if (onboardStep < ONBOARD_HINTS.length && raw.trim().startsWith(ONBOARD_HINTS[onboardStep]?.cmd?.split(' ')[0])) {
+    advanceOnboard();
+  }
+
   // Skill commands
   if (cmd.startsWith('/')) {
     const skillName = cmd.slice(1);
@@ -1033,20 +1074,181 @@ Models: claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5`);
       break;
 
     case 'date':
-      term.writeln('Sun Mar 30 2026 — Week 14');
+      term.writeln(new Date().toLocaleDateString('en-US', {weekday:'short', year:'numeric', month:'short', day:'numeric'}));
       prompt();
       break;
+
+    case 'which':
+      if (args === 'claude') term.writeln('/opt/homebrew/bin/claude');
+      else if (args === 'node') term.writeln('/opt/homebrew/bin/node');
+      else if (args === 'npm') term.writeln('/opt/homebrew/bin/npm');
+      else term.writeln(`${args}: not found`);
+      prompt();
+      break;
+
+    case 'grep': {
+      const gparts = args.split(/\s+/);
+      const pattern = gparts[0]?.replace(/['"]/g, '') || '';
+      if (!pattern) { term.writeln('Usage: grep <pattern> [path]'); prompt(); break; }
+      let matches = [];
+      Object.entries(FS).forEach(([path, node]) => {
+        if (node.type === 'file' && node.content && node.content.toLowerCase().includes(pattern.toLowerCase())) {
+          const lines = node.content.split('\n');
+          lines.forEach((line, i) => {
+            if (line.toLowerCase().includes(pattern.toLowerCase())) {
+              matches.push({file: path, line: i+1, text: line.trim()});
+            }
+          });
+        }
+        if (path.toLowerCase().includes(pattern.toLowerCase())) {
+          matches.push({file: path, line: 0, text: '(filename match)'});
+        }
+      });
+      if (matches.length === 0) {
+        term.writeln(`\x1b[90mNo matches for "${pattern}"\x1b[0m`);
+      } else {
+        matches.slice(0, 15).forEach(m => {
+          const highlighted = m.text.replace(new RegExp(`(${pattern})`, 'gi'), '\x1b[31m$1\x1b[0m');
+          term.writeln(`\x1b[35m${m.file}\x1b[0m${m.line ? ':'+m.line : ''}: ${highlighted}`);
+        });
+        if (matches.length > 15) term.writeln(`\x1b[90m...and ${matches.length - 15} more matches\x1b[0m`);
+      }
+      prompt();
+      break;
+    }
+
+    case 'find': {
+      const fpattern = args.replace(/['"*]/g, '').toLowerCase();
+      if (!fpattern) { term.writeln('Usage: find <pattern>'); prompt(); break; }
+      const found = Object.keys(FS).filter(p => p.toLowerCase().includes(fpattern));
+      if (found.length === 0) {
+        term.writeln(`\x1b[90mNo paths matching "${fpattern}"\x1b[0m`);
+      } else {
+        found.forEach(p => {
+          const isDir = FS[p].type === 'dir';
+          term.writeln(`${isDir ? '\x1b[36m' : ''}${p}${isDir ? '/\x1b[0m' : ''}`);
+        });
+      }
+      prompt();
+      break;
+    }
+
+    case 'echo':
+      term.writeln(args);
+      prompt();
+      break;
+
+    case 'git': {
+      if (args === 'status') {
+        term.writeln(`On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean`);
+      } else if (args === 'log' || args.startsWith('log')) {
+        term.writeln(`\x1b[33mcommit 6d9ee29\x1b[0m (HEAD -> main, origin/main)
+Author: Alex <alex@aimindset.org>
+Date:   Sun Mar 30 2026
+
+    Initial commit: Claude Code Lab course for AI Mindset`);
+      } else if (args.startsWith('clone')) {
+        typeWriter(`Cloning into 'aim-claude-code-lab'...
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+\x1b[32m✓ Clone complete\x1b[0m
+
+Next steps:
+  \x1b[36mcd aim-claude-code-lab\x1b[0m
+  \x1b[36mclaude\x1b[0m
+  \x1b[36mlesson 1\x1b[0m`, () => prompt());
+        return;
+      } else {
+        term.writeln(`git: '${args.split(' ')[0]}' simulated. try: status, log, clone`);
+      }
+      prompt();
+      break;
+    }
+
+    case 'setup': {
+      typeWriter(`\x1b[36m━━━ Claude Code Setup Guide ━━━━━━━━━━━━━━━\x1b[0m
+
+\x1b[1mStep 1: Install\x1b[0m
+  \x1b[36m$ npm install -g @anthropic-ai/claude-code\x1b[0m
+
+\x1b[1mStep 2: Authenticate\x1b[0m
+  \x1b[36m$ claude login\x1b[0m
+  → opens browser → select "Claude Pro subscription"
+
+\x1b[1mStep 3: Clone this course\x1b[0m
+  \x1b[36m$ git clone https://github.com/aPoWall/aim-claude-code-lab\x1b[0m
+  \x1b[36m$ cd aim-claude-code-lab\x1b[0m
+
+\x1b[1mStep 4: Launch Claude Code\x1b[0m
+  \x1b[36m$ claude\x1b[0m
+  → type: "open lesson 1"
+
+\x1b[1mStep 5: Add CLAUDE.md\x1b[0m
+  \x1b[36m$ claude "создай CLAUDE.md с правилами AI Mindset"\x1b[0m
+
+\x1b[33mRequirements:\x1b[0m
+  • Node.js 18+ (node --version)
+  • Claude Pro/Max subscription ($20/mo)
+  • macOS / Linux / WSL
+
+\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`, () => prompt());
+      return;
+    }
+
+    case 'next': {
+      const done = [...lessonProgress].length;
+      const nextIdx = done < LESSONS.length ? done + 1 : 1;
+      executeCommand(`lesson ${nextIdx}`);
+      return;
+    }
+
+    case 'progress': {
+      const total = LESSONS.length;
+      const done = lessonProgress.size;
+      const pct = Math.round((done / total) * 100);
+      const bar = '█'.repeat(Math.round(pct/5)) + '░'.repeat(20 - Math.round(pct/5));
+      term.writeln(`\x1b[36mProgress: ${bar} ${pct}% (${done}/${total})\x1b[0m`);
+      term.writeln('');
+      LESSONS.forEach((l, i) => {
+        const check = lessonProgress.has(l.id || `l${i}`) ? '\x1b[32m✓\x1b[0m' : '\x1b[90m○\x1b[0m';
+        term.writeln(`  ${check}  ${String(i+1).padStart(2)}. ${l.title}`);
+      });
+      prompt();
+      break;
+    }
+
+    case 'reset': {
+      lessonProgress.clear();
+      localStorage.removeItem('cclab-done');
+      localStorage.removeItem('cclab-onboard');
+      onboardStep = 0;
+      term.writeln('\x1b[33mProgress reset.\x1b[0m');
+      updateProgress();
+      prompt();
+      break;
+    }
 
     case 'lesson': {
       const idx = parseInt(args) - 1;
       if (idx >= 0 && idx < LESSONS.length) {
         const l = LESSONS[idx];
+        lessonProgress.add(l.id || `l${idx}`);
+        localStorage.setItem('cclab-done', JSON.stringify([...lessonProgress]));
+        updateProgress();
+        advanceOnboard();
         term.writeln('');
         term.writeln(`\x1b[36m━━━ Lesson ${l.num}: ${l.title} ━━━━━━━━━━━━━━━\x1b[0m`);
         term.writeln(`\x1b[90m${l.mod} · ${l.time}\x1b[0m`);
         term.writeln('');
         term.writeln(l.tutorial);
         term.writeln('');
+        if (idx < LESSONS.length - 1) {
+          term.writeln(`\x1b[90mType \x1b[36mnext\x1b[90m for lesson ${idx + 2}, or try the commands above.\x1b[0m`);
+          term.writeln('');
+        }
       } else {
         term.writeln('Usage: lesson <number>  (1-13)');
         term.writeln('');
@@ -1088,16 +1290,27 @@ function showHelp() {
   pwd            Print working directory
   tree [path]    Show directory tree
   cat <file>     Read file contents
+  grep <text>    Search in files
+  find <name>    Find paths by name
   clear          Clear terminal
 
 \x1b[33mClaude Code:\x1b[0m
   claude         Launch Claude Code
   claude --help  Show Claude options
   claude login   Authenticate
+  setup          Full setup guide
 
 \x1b[33mLessons:\x1b[0m
   lesson         List all lessons
   lesson <n>     Open lesson by number
+  next           Next lesson
+  progress       Show completion
+  reset          Reset progress
+
+\x1b[33mGit:\x1b[0m
+  git status     Working tree status
+  git log        Commit history
+  git clone URL  Clone repository
 
 \x1b[33mSkills (${Object.keys(SKILLS).length} available):\x1b[0m`);
 
@@ -1310,6 +1523,52 @@ function renderVaultTree() {
 }
 
 // ============================================================
+// PROGRESS & ONBOARDING
+// ============================================================
+function updateProgress() {
+  const total = LESSONS.length;
+  const done = lessonProgress.size;
+  document.getElementById('navProgress').textContent = `${done}/${total}`;
+}
+
+function advanceOnboard() {
+  onboardStep++;
+  localStorage.setItem('cclab-onboard', String(onboardStep));
+  showOnboardHint();
+}
+
+function showOnboardHint() {
+  let hint = document.getElementById('onboardHint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'onboard-hint';
+    hint.id = 'onboardHint';
+    document.body.appendChild(hint);
+  }
+
+  if (onboardStep >= ONBOARD_HINTS.length) {
+    hint.classList.remove('visible');
+    return;
+  }
+
+  const h = ONBOARD_HINTS[onboardStep];
+  hint.innerHTML = `<span class="hint-close" onclick="this.parentElement.classList.remove('visible')">x</span>
+    <div style="margin-bottom:6px;color:var(--teal);font-size:0.6rem;text-transform:uppercase;letter-spacing:1px">Step ${onboardStep + 1} of ${ONBOARD_HINTS.length}</div>
+    <div>Try: <span class="hint-cmd">${h.cmd}</span></div>`;
+  hint.classList.add('visible');
+}
+
+function runInTerminal(cmd) {
+  switchTab('terminal');
+  setTimeout(() => {
+    cmdBuffer = cmd;
+    term.write(cmd);
+    executeCommand(cmd);
+    cmdBuffer = '';
+  }, 100);
+}
+
+// ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1317,6 +1576,12 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLessons();
   renderSkills();
   renderVaultTree();
+  updateProgress();
+
+  // Show onboarding hint after terminal is ready
+  setTimeout(() => {
+    if (onboardStep < ONBOARD_HINTS.length) showOnboardHint();
+  }, 1500);
 });
 </script>
 
