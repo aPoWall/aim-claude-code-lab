@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Lab — AI Mindset</title>
+  <meta property="og:title" content="Claude Code Lab — AI Mindset">
+  <meta property="og:description" content="Интерактивный курс Claude Code с живым терминалом">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- xterm.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
+  <style>
+    :root {
+      --bg: #0e0e18;
+      --bg-card: #161620;
+      --bg-term: #0a0a12;
+      --teal: #4dc9d4;
+      --teal-dim: rgba(77,201,212,0.15);
+      --teal-glow: rgba(77,201,212,0.3);
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --purple: #a78bfa;
+      --text: #e8e8ef;
+      --text-dim: rgba(232,232,239,0.5);
+      --text-label: rgba(232,232,239,0.4);
+      --border: rgba(77,201,212,0.12);
+      --mono: 'IBM Plex Mono','SF Mono','Fira Code',monospace;
+      --sans: 'Space Grotesk',-apple-system,sans-serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{font-size:15px;scroll-behavior:smooth}
+    body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(77,201,212,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(77,201,212,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+
+    .container{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+    /* NAV */
+    .topnav{position:sticky;top:0;z-index:200;background:rgba(14,14,24,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0}
+    .topnav-inner{display:flex;align-items:center;height:48px;gap:16px}
+    .topnav-brand{font-family:var(--sans);font-weight:700;font-size:0.85rem;color:var(--teal);white-space:nowrap}
+    .topnav-tabs{display:flex;gap:2px;flex:1;justify-content:center}
+    .topnav-tab{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-label);padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+    .topnav-tab:hover{color:var(--text-dim)}
+    .topnav-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+    .topnav-progress{font-size:0.7rem;color:var(--teal);font-weight:600;white-space:nowrap}
+
+    /* HERO */
+    .hero{padding:60px 0 40px;text-align:center}
+    .hero-badge{display:inline-block;font-size:0.65rem;font-weight:500;text-transform:uppercase;letter-spacing:3px;color:var(--teal);border:1px solid var(--teal-dim);padding:5px 14px;border-radius:2px;margin-bottom:20px;background:rgba(77,201,212,0.05)}
+    .hero h1{font-family:var(--sans);font-size:2.8rem;font-weight:700;line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,var(--text) 0%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-sub{font-size:0.95rem;color:var(--text-dim);font-weight:300;line-height:1.6;max-width:520px;margin:0 auto 32px}
+    .hero-stats{display:flex;justify-content:center;gap:40px;font-size:0.7rem;color:var(--text-label);text-transform:uppercase;letter-spacing:1.5px}
+    .hero-stats .stat-val{display:block;font-family:var(--sans);font-size:1.6rem;font-weight:700;color:var(--teal);margin-bottom:4px}
+
+    /* SECTIONS */
+    .section{display:none;padding:40px 0 80px}
+    .section.active{display:block}
+    .section-title{font-family:var(--sans);font-size:1.4rem;font-weight:600;margin-bottom:24px}
+    .section-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-label);margin-bottom:8px}
+
+    /* TERMINAL WRAPPER */
+    .term-wrapper{background:var(--bg-term);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:24px 0;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+    .term-chrome{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(77,201,212,0.03);border-bottom:1px solid var(--border)}
+    .term-dot{width:11px;height:11px;border-radius:50%}
+    .term-dot.r{background:#ff5f57}.term-dot.y{background:#febc2e}.term-dot.g{background:#28c840}
+    .term-title{font-size:0.7rem;color:var(--text-label);margin-left:8px;flex:1;text-align:center}
+    .term-size{font-size:0.6rem;color:var(--text-label);opacity:0.5}
+    .term-body{height:460px;padding:4px}
+    .term-body-large{height:600px}
+
+    /* XTERM OVERRIDES */
+    .xterm{padding:8px}
+    .xterm-viewport::-webkit-scrollbar{width:6px}
+    .xterm-viewport::-webkit-scrollbar-track{background:transparent}
+    .xterm-viewport::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+    /* LESSON CARDS */
+    .lesson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .lesson-card{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:20px;cursor:pointer;transition:all .3s}
+    .lesson-card:hover{border-color:var(--teal-dim);box-shadow:0 0 20px rgba(77,201,212,0.06);transform:translateY(-2px)}
+    .lesson-card.done{opacity:0.6}
+    .lesson-card.done:hover{opacity:0.8}
+    .lesson-num{font-family:var(--sans);font-size:2rem;font-weight:700;color:var(--teal);opacity:0.3;margin-bottom:8px}
+    .lesson-card:hover .lesson-num{opacity:0.6}
+    .lesson-title{font-family:var(--sans);font-size:1rem;font-weight:600;margin-bottom:6px}
+    .lesson-desc{font-size:0.75rem;color:var(--text-dim);line-height:1.5;font-weight:300}
+    .lesson-meta{margin-top:12px;display:flex;justify-content:space-between;align-items:center}
+    .lesson-time{font-size:0.65rem;color:var(--text-label)}
+    .lesson-badge{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:2px}
+    .badge-practice{color:var(--green);border:1px solid rgba(34,197,94,0.2);background:rgba(34,197,94,0.05)}
+    .badge-theory{color:var(--blue);border:1px solid rgba(59,130,246,0.2);background:rgba(59,130,246,0.05)}
+    .badge-advanced{color:var(--purple);border:1px solid rgba(167,139,250,0.2);background:rgba(167,139,250,0.05)}
+
+    /* SKILL CATALOG */
+    .skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+    .skill-item{display:flex;gap:12px;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all .2s}
+    .skill-item:hover{border-color:var(--teal-dim);background:rgba(77,201,212,0.03)}
+    .skill-cmd{color:var(--teal);font-weight:600;font-size:0.82rem;white-space:nowrap;min-width:140px}
+    .skill-desc{font-size:0.72rem;color:var(--text-dim);line-height:1.4}
+    .skill-cat{margin-top:32px;margin-bottom:12px}
+    .skill-cat-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--amber);border-bottom:1px solid rgba(245,158,11,0.15);padding-bottom:6px}
+
+    /* VAULT TREE */
+    .vault-tree{font-size:0.78rem;line-height:1.8;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:4px}
+    .tree-dir{color:var(--teal);font-weight:500}
+    .tree-comment{color:var(--text-label);font-style:italic;margin-left:12px}
+    .tree-indent{margin-left:20px}
+
+    /* FOOTER */
+    .site-footer{padding:24px 0;border-top:1px solid var(--border);text-align:center;font-size:0.6rem;color:var(--text-label);letter-spacing:1px}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .hero h1{font-size:1.8rem}
+      .hero-stats{flex-direction:column;gap:16px}
+      .term-body{height:360px}
+      .topnav-tabs{gap:0}
+      .topnav-tab{padding:14px 8px;font-size:0.6rem}
+      .lesson-grid{grid-template-columns:1fr}
+      .skill-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <div class="container">
+    <div class="topnav-inner">
+      <div class="topnav-brand">CC Lab</div>
+      <div class="topnav-tabs">
+        <div class="topnav-tab active" data-tab="terminal" onclick="switchTab('terminal')">Terminal</div>
+        <div class="topnav-tab" data-tab="lessons" onclick="switchTab('lessons')">Lessons</div>
+        <div class="topnav-tab" data-tab="skills" onclick="switchTab('skills')">Skills</div>
+        <div class="topnav-tab" data-tab="vault" onclick="switchTab('vault')">Vault</div>
+      </div>
+      <div class="topnav-progress" id="navProgress">0/13</div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">AI Mindset &middot; Claude Code Lab</div>
+    <h1>Learn by Doing</h1>
+    <p class="hero-sub">Живой терминал. Реальная структура vault. Настоящие скиллы. Вводи команды — учись на практике.</p>
+    <div class="hero-stats">
+      <div><span class="stat-val">60+</span>skills</div>
+      <div><span class="stat-val">7</span>MCP servers</div>
+      <div><span class="stat-val">13</span>lessons</div>
+    </div>
+  </section>
+
+  <!-- TAB: TERMINAL -->
+  <section class="section active" id="tab-terminal">
+    <div class="term-wrapper">
+      <div class="term-chrome">
+        <div class="term-dot r"></div>
+        <div class="term-dot y"></div>
+        <div class="term-dot g"></div>
+        <span class="term-title">claude code lab &mdash; ~/ai-mindset</span>
+        <span class="term-size" id="termSize"></span>
+      </div>
+      <div class="term-body term-body-large" id="mainTerminal"></div>
+    </div>
+  </section>
+
+  <!-- TAB: LESSONS -->
+  <section class="section" id="tab-lessons">
+    <div class="section-label">Module 00 &mdash; Setup</div>
+    <div class="section-title">Установка и первый запуск</div>
+    <div class="lesson-grid" id="lessonsGrid"></div>
+  </section>
+
+  <!-- TAB: SKILLS -->
+  <section class="section" id="tab-skills">
+    <div class="section-title">Каталог скиллов</div>
+    <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:24px;font-weight:300">
+      Введи <code style="color:var(--teal)">/skill-name</code> в терминале чтобы запустить. Все скиллы работают в live terminal.
+    </p>
+    <div id="skillsCatalog"></div>
+  </section>
+
+  <!-- TAB: VAULT -->
+  <section class="section" id="tab-vault">
+    <div class="section-title">Структура Vault</div>
+    <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:24px;font-weight:300">
+      Obsidian vault AI Mindset — 11,865 документов. Введи <code style="color:var(--teal)">tree</code> или <code style="color:var(--teal)">ls папка/</code> в терминале.
+    </p>
+    <div class="vault-tree" id="vaultTree"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">AI Mindset &middot; Claude Code Lab &middot; 2026 &middot; built with Claude Code</div>
+</footer>
+
+<script>
+// ============================================================
+// VIRTUAL FILESYSTEM — real vault structure
+// ============================================================
+const FS = {
+  '~': {type:'dir', children:['ai-mindset-2026','notes','CLAUDE.md','.claude']},
+  '~/CLAUDE.md': {type:'file', content:`# CLAUDE Behavior Rules
+
+## Formatting Requirements
+- Use **bold** for key concepts
+- Follow {project} {type} description – YYYY-MM-DD.md naming
+- Never create new folders
+
+## Team Roles
+| Person | Role                    |
+|--------|-------------------------|
+| Alex   | Founder & Vision Lead   |
+| Ira    | Operations              |
+| Vlada  | Partnerships            |
+| Dan    | Tech                    |
+| Katya  | Content & Design        |
+| Olya   | Operations, POS         |
+| Lena   | PM Coordinator          |
+| Karina | (newest)                |
+
+## MCP Telegram — Rules
+- NEVER send to AI Mindset channel (ID: 1877517944)
+- Style: lowercase, no emoji, en dash, concrete
+
+## Context Management Protocol
+| Symbol | Threshold | Mode |
+|--------|-----------|------|
+| ●      | < 50%     | OK   |
+| ◐      | 50-70%    | WARN |
+| ○      | > 70%     | CRIT |`},
+  '~/notes': {type:'dir', children:['rules/','_inbox/','transcripts/','tasks/','articles/','_templates/','scripts/','data/','Clippings/','summaries/','voicenotes/','AI chats/','Excalidraw/','_data/','publish/','code tools/']},
+  '~/notes/rules/': {type:'dir', children:['{rule} file naming convention for Obsidian.md','{rule} AI Mindset Project Communication.md','{rule} Claude Context Management Protocol.md','{rule} presentations Swiss Red-White Deck Style.md','...47 more files']},
+  '~/.claude': {type:'dir', children:['skills/','memory/','settings.json','mcp.json','evals/']},
+  '~/.claude/skills/': {type:'dir', children:['AIM-cover-gen/','AIM-crm/','AIM-imagine/','AIM-skill-forge/','ambient-advisor/','calendar/','ceo-council/','content-voice/','context-compact/','daily-focus/','daily-metaphor/','daily-story/','eval/','excalidraw/','focus/','focus-ship-sprint/','history/','idea/','imagine/','infocompressor/','intro/','linear-action/','os-mind/','paperclip/','para-memory-files/','pos-audit/','pos-dashboard-gen/','pos-morning/','pos-setup/','pos-skill-factory/','reel-edit/','reflect/','remind/','research/','session-recall/','sessions/','style-bible/','telegram/','terminal-restart/','undone/','vault-cleanup/','video-art/','visual-pipeline/','vox/']},
+  '~/.claude/mcp.json': {type:'file', content:`{
+  "mcpServers": {
+    "linear":    { "command": "npx", "args": ["@anthropic-ai/mcp-linear"] },
+    "exa":       { "command": "npx", "args": ["@modelcontextprotocol/server-exa"] },
+    "telegram":  { "command": "node", "args": ["telegram-mcp/server.js"] },
+    "notion":    { "command": "npx", "args": ["@notionhq/mcp-server"] },
+    "sheets":    { "command": "npx", "args": ["@anthropic-ai/mcp-sheets"] },
+    "krisp":     { "command": "npx", "args": ["@krisp-ai/mcp-server"] },
+    "playwright":{ "command": "npx", "args": ["@anthropic-ai/mcp-playwright"] }
+  }
+}`},
+  '~/ai-mindset-2026': {type:'dir', children:['AGENTS.md','aim-rules/','inbox/','meetings/','Labs/','Org/','Products Ecosystem/','aim context/','aim-guides/','_data/']},
+  '~/ai-mindset-2026/aim-rules/': {type:'dir', children:['skills/','marketing/','rules_tech/','rules_texts, announces/','rules_visuals/','visual-toolkit/','{rule} AI Mindset Project Communication.md','{rule} naming convention.md','{prd} Linear Awareness Layer.md','...24 more files']},
+  '~/ai-mindset-2026/aim-rules/skills/': {type:'dir', children:['AIM-bio/','AIM-carousel/','AIM-chat/','AIM-content-voice/','AIM-crm/','AIM-curator/','AIM-deck-ainative/','AIM-deck-style/','AIM-imagine/','AIM-lab/','AIM-lab-announce/','AIM-lab-closing/','AIM-meeting-summary/','AIM-og-covers/','AIM-pm/','AIM-pos-blocks/','AIM-process/','AIM-space-new-members/','AIM-sprint-monitor/','AIM-stacks-new-site/','AIM-summary/','AIM-utm/','AIM-visual/','AIM-weekly-sync/']},
+  '~/ai-mindset-2026/inbox/': {type:'dir', children:['{AIM} {research} Competitor Analysis – 2026-03-30.md','{AIM} {analysis} POS Sprint Chat Analysis – 2026-03-11.md','{AIM} {research} B2B Education Ecosystem – 2026-01-14.md','logs/','deck-skill-public/','...38 more files']},
+  '~/ai-mindset-2026/meetings/': {type:'dir', children:['one-on-one/','weekly-syncs/','{meeting} AIM Marketing Weekly Sync – 2026-01-08.md','{transcript} {krisp} AI mindset weekly – 2026-03-28.md','...64 more files']},
+  '~/ai-mindset-2026/Labs/': {type:'dir', children:['s1 – POS sprint/','s2 – ai-native sprint/','s3 – self-dev sprint/','w26/','x26 – spring lab/','auto02/','Pitch Lab/','demodays/','_passed labs/']},
+  '~/ai-mindset-2026/Org/': {type:'dir', children:['HR/','Partners/','Processes/','Marketing&Sales/','infrastructure/','Curators/','offers/']},
+  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Lena Korchemagina.md','{role} Karina Vantslav.md']},
+  '~/ai-mindset-2026/Products Ecosystem/': {type:'dir', children:['Space/','Circle/','B2B/','Borodich Ventures/','Gershuni Partnership/','infrastructure МС/']},
+};
+
+// ============================================================
+// SKILLS DATABASE — real skills with demo outputs
+// ============================================================
+const SKILLS = {
+  // === POS & System ===
+  'pos-morning': {cat:'POS & System', desc:'Morning brief — calendar + tasks + sessions + vault', demo:`\x1b[36m━━━ Morning Brief ━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+\x1b[33m📅 Calendar:\x1b[0m 3 events today
+  09:00  Team sync
+  11:00  Partnership call — CloudRu
+  14:00  Office hours — AI-Native Sprint
+
+\x1b[33m◐ Linear:\x1b[0m 5 tasks in progress
+  AIM-2054  BOS speakers outreach
+  AIM-2186  Content calendar Q2
+  AIM-2201  Lab closing checklist
+  AIM-2245  Claude Code Lab materials
+  AIM-2251  POS metrics dashboard
+
+\x1b[33m🧠 Last session:\x1b[0m 2026-03-30 20:34 — Claude Code Lab
+\x1b[33m🎯 Focus:\x1b[0m closing week POS Sprint
+
+\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`},
+
+  'pos-audit': {cat:'POS & System', desc:'Scan POS infrastructure — score 0-12', demo:`\x1b[36mScanning POS infrastructure...\x1b[0m
+
+  CLAUDE.md          \x1b[32m✓\x1b[0m  2.4KB, 12 sections
+  Skills             \x1b[32m✓\x1b[0m  44 global + 24 team + 8 local
+  MCP Servers        \x1b[32m✓\x1b[0m  7 connected (linear, telegram, exa, notion, sheets, krisp, playwright)
+  Hooks              \x1b[32m✓\x1b[0m  4 active (SessionStart: linear-cache, telegram-cleanup)
+  Memory             \x1b[32m✓\x1b[0m  23 entries in auto-memory
+  Context Protocol   \x1b[32m✓\x1b[0m  footer active, eval active
+  Linear Layer       \x1b[32m✓\x1b[0m  ambient detection ON
+  Telegram Channel   \x1b[32m✓\x1b[0m  bot configured, access policy set
+  Evals System       \x1b[32m✓\x1b[0m  rubric + log + improvements
+  Shepherd           \x1b[32m✓\x1b[0m  gather.sh + SwiftBar + Dashboard
+  QMD Search         \x1b[32m✓\x1b[0m  11,865 docs indexed
+  Cron               \x1b[33m◐\x1b[0m  partial — 2 of 4 automations
+
+  \x1b[36mPOS Score: 11/12\x1b[0m
+  Missing: Full cron automation coverage`},
+
+  'daily-focus': {cat:'POS & System', desc:'Daily focus + visual metaphor → Telegram', demo:`\x1b[36mSynthesizing daily focus...\x1b[0m
+
+\x1b[1m#focus 30 марта\x1b[0m
+
+closing week POS Sprint.
+три вещи: lab closing checklist,
+content calendar draft, partnership call.
+всё остальное – шум.
+
+\x1b[33m→ Send to Telegram Saved Messages? (y/n)\x1b[0m`},
+
+  'vox': {cat:'POS & System', desc:'Terminal day advisor — full context → actionable plan', demo:`\x1b[36m━━━ VOX Day Advisor ━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+\x1b[1mContext loaded:\x1b[0m calendar ✓ linear ✓ krisp ✓ vault ✓ focus ✓
+
+\x1b[33mPriority 1:\x1b[0m Lab closing checklist (AIM-2201)
+  → блокирует закрытие POS Sprint
+  → Олю cc, она ведёт operations
+
+\x1b[33mPriority 2:\x1b[0m Partnership call 11:00
+  → прочитай partner-b2b-lead-cloud-ru.md перед звонком
+  → подготовь 3 вопроса
+
+\x1b[33mPriority 3:\x1b[0m Content calendar draft
+  → Катя ждёт review, дедлайн завтра
+
+\x1b[31mНЕ делать сегодня:\x1b[0m новые фичи, рефакторинг, ресерч
+\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`},
+
+  'calendar': {cat:'POS & System', desc:'Google Calendar events — today/week', demo:`\x1b[36m📅 Today — 30 марта 2026 (воскресенье)\x1b[0m
+
+  09:00-09:30  Team sync
+  11:00-11:45  Partnership call — CloudRu
+  14:00-15:30  Office hours — AI-Native Sprint s2
+
+  \x1b[33mTomorrow:\x1b[0m
+  10:00  1-on-1 with Ira
+  16:00  FOS #22 session`},
+
+  'sessions': {cat:'POS & System', desc:'Recent Claude Code sessions', demo:`\x1b[36mRecent sessions:\x1b[0m
+
+  20:34  Claude Code Lab course          \x1b[32m● active\x1b[0m
+  18:12  Agent Timeline Dashboard         40 min
+  16:45  Ops Metrics Initiative           25 min
+  14:20  AI Champion B2B offer            35 min
+  11:05  Telegram caption style fix       12 min
+
+  \x1b[33mTotal today: 5 sessions, ~3.2h\x1b[0m`},
+
+  // === Team ===
+  'AIM-pm': {cat:'Team', desc:'Team Process Manager — review, sync, summary', demo:`\x1b[36m━━━ AIM PM Dashboard ━━━━━━━━━━━━━━━━━━\x1b[0m
+
+\x1b[1mTeam Status (30 марта):\x1b[0m
+
+  Alex   \x1b[32m●\x1b[0m  5 IP tasks — Claude Code Lab, Ops Metrics
+  Ira    \x1b[32m●\x1b[0m  3 IP tasks — POS Sprint closing, scheduling
+  Dan    \x1b[32m●\x1b[0m  4 IP tasks — Infrastructure, monorepo
+  Katya  \x1b[33m◐\x1b[0m  2 IP tasks — Content calendar, carousel
+  Olya   \x1b[32m●\x1b[0m  3 IP tasks — POS ops, sprint monitor
+  Vlada  \x1b[32m●\x1b[0m  2 IP tasks — CloudRu, Borodich
+  Lena   \x1b[32m●\x1b[0m  3 IP tasks — PM coordination, Lab schedule
+
+\x1b[33mBlocked:\x1b[0m 0
+\x1b[33mOverdue:\x1b[0m 1 (Content calendar — Katya, due yesterday)
+\x1b[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`},
+
+  'AIM-lab': {cat:'Team', desc:'Lab hub — chat monitor, replies, digest, feedback', demo:`\x1b[36m━━━ AI-Native Sprint s2 — Lab Hub ━━━━━\x1b[0m
+
+\x1b[1mChat Activity (last 24h):\x1b[0m
+  Messages: 47 (12 threads)
+  Active: 18 of 32 participants
+  Top thread: "POS setup — CLAUDE.md вопросы" (23 msgs)
+
+\x1b[1mPending:\x1b[0m
+  3 unanswered questions
+  1 shared project for review
+
+\x1b[33mOptions:\x1b[0m
+  [1] Reply to questions
+  [2] Generate weekly digest
+  [3] Audience analysis
+  [4] Feedback collection`},
+
+  'linear-action': {cat:'Team', desc:'Linear task actions — update, close, comment, create', demo:`\x1b[36mLinear Action\x1b[0m
+
+Usage: /linear-action <ID> <action>
+
+Actions:
+  update    — add progress comment
+  close     — mark as Done
+  comment   — add note
+  reassign  — change assignee
+  create    — new issue
+
+Example: /linear-action AIM-2054 update`},
+
+  'research': {cat:'Research', desc:'Deep parallel research via Exa sub-agents', demo:`\x1b[36m━━━ Research Engine ━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Presets: video, competitor, edtech, product, market
+
+\x1b[33mLaunching 3 Exa sub-agents...\x1b[0m
+
+◈ Agent 1: market landscape...
+◈ Agent 2: competitor analysis...
+◈ Agent 3: trend detection...
+
+◉ Agent 1 done (8s) — 12 sources found
+◉ Agent 3 done (11s) — 5 emerging trends
+◉ Agent 2 done (14s) — 8 competitors mapped
+
+\x1b[32mSynthesizing results...\x1b[0m`},
+
+  'AIM-carousel': {cat:'Content', desc:'Instagram carousel/stories generation — 7 styles', demo:`\x1b[36m━━━ AIM Carousel Generator ━━━━━━━━━━━\x1b[0m
+
+Available styles:
+  1. \x1b[36mbrutalist\x1b[0m      — raw, bold, high contrast
+  2. \x1b[36mcollage\x1b[0m        — mixed media, overlapping
+  3. \x1b[36meditorial\x1b[0m      — clean, magazine layout
+  4. \x1b[36mainative-teal\x1b[0m  — AI-Native Sprint brand
+  5. \x1b[36mlab-x26\x1b[0m        — spring lab aesthetic
+  6. \x1b[36mcinema-dark\x1b[0m    — amber + teal cinematic
+  7. \x1b[36mblueprint\x1b[0m      — blue technical drawings
+
+Formats: Stories 1080x1920, Carousel 1080x1350, Banner 1500x500
+Export: 2x retina PNG + MP4
+
+\x1b[33mProvide topic and style number:\x1b[0m`},
+
+  'AIM-meeting-summary': {cat:'Content', desc:'Enriched meeting summary → Telegram', demo:`\x1b[36mMeeting Summary Generator\x1b[0m
+
+Provide transcript file or Krisp meeting link.
+
+Will extract:
+  • Key decisions
+  • Action items (who → what → when)
+  • Open questions
+  • Follow-up needed
+
+Output: markdown in meetings/ + Telegram message`},
+
+  'infocompressor': {cat:'Utilities', desc:'Text compression with 100% data retention', demo:`\x1b[36mInfoCompressor v2\x1b[0m
+
+Modes:
+  compress  — dense summary, zero data loss
+  cheatsheet — structured reference card
+  brief     — executive summary
+
+Paste text or provide file path.
+Target compression: 3-5x reduction.`},
+
+  'imagine': {cat:'Content', desc:'Image generation via OpenRouter (multiple models)', demo:`\x1b[36m━━━ Imagine ━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Models:
+  1. Nano Banana     — fast, experimental
+  2. GPT-5           — photorealistic
+  3. Flux            — artistic, stylized
+  4. Seedream        — Google, high quality
+
+\x1b[33mDescribe what you want to generate:\x1b[0m`},
+
+  'ceo-council': {cat:'Strategy', desc:'Multi-expert strategic analysis via parallel Opus agents', demo:`\x1b[36m━━━ CEO Council ━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Launching 4 independent expert perspectives...
+
+\x1b[33m◈ Growth Strategist\x1b[0m analyzing...
+\x1b[33m◈ Product Architect\x1b[0m analyzing...
+\x1b[33m◈ Financial Advisor\x1b[0m analyzing...
+\x1b[33m◈ Risk Analyst\x1b[0m analyzing...
+
+Provide your strategic question:`},
+
+  'content-voice': {cat:'Content', desc:'Human voice proofreading — remove AI tone', demo:`\x1b[36mContent Voice — Human Proofreading\x1b[0m
+
+Tones: neutral, partner, editorial, gonzo
+
+Rules:
+  • Remove AI patterns ("в рамках", "хотелось бы")
+  • Keep author's actual voice
+  • EN dash, lowercase blocks, no emoji
+  • Concrete > abstract
+
+Paste text to proofread:`},
+
+  'reflect': {cat:'POS & System', desc:'Analyze eval patterns → generate CLAUDE.md rules', demo:`\x1b[36m━━━ Reflect — Weekly Review ━━━━━━━━━━━\x1b[0m
+
+Analyzing 47 evals from this week...
+
+Patterns found:
+  \x1b[32m✓ T (Text):\x1b[0m 44/47 pass — strong
+  \x1b[33m◐ R (Rules):\x1b[0m 41/47 pass — 6 naming misses
+  \x1b[32m✓ C (Code):\x1b[0m 38/40 pass — 2 overengineering
+
+\x1b[33mSuggested rule:\x1b[0m
+  "Always check naming convention before creating files"
+
+Add to CLAUDE.md? (y/n)`},
+
+  'help': {cat:'System', desc:'List all available commands and skills', demo:''}
+};
+
+// ============================================================
+// LESSONS DATA
+// ============================================================
+const LESSONS = [
+  {mod:'00 Setup', num:'01', title:'Установка Claude Code', desc:'npm install, авторизация, первый запуск', time:'10 мин', badge:'practice',
+   tutorial:`Добро пожаловать в Claude Code Lab!
+
+Начнём с установки. Попробуй эти команды:
+
+  \x1b[36m$ npm install -g @anthropic-ai/claude-code\x1b[0m
+  \x1b[36m$ claude --version\x1b[0m
+  \x1b[36m$ claude login\x1b[0m
+
+После установки запусти Claude Code в рабочей папке:
+
+  \x1b[36m$ cd ~/ai-mindset-2026\x1b[0m
+  \x1b[36m$ claude\x1b[0m
+
+Агент получит доступ ко всем файлам. Попробуй!`},
+  {mod:'00 Setup', num:'02', title:'Терминал для нетехнических', desc:'pwd, ls, cd — минимум для работы', time:'10 мин', badge:'theory',
+   tutorial:`Терминал — текстовый интерфейс. Минимум команд:
+
+  \x1b[36mpwd\x1b[0m        — где я сейчас
+  \x1b[36mls\x1b[0m         — что в папке
+  \x1b[36mls папка/\x1b[0m  — что внутри папки
+  \x1b[36mcd папка\x1b[0m   — перейти в папку
+  \x1b[36mcd ..\x1b[0m      — вернуться назад
+  \x1b[36mcat файл\x1b[0m   — прочитать файл
+  \x1b[36mtree\x1b[0m       — дерево папок
+
+Попробуй: \x1b[36mls\x1b[0m, затем \x1b[36mls .claude/skills/\x1b[0m`},
+  {mod:'01 Fundamentals', num:'03', title:'Первый диалог с агентом', desc:'Промпты, файловые операции, поиск', time:'15 мин', badge:'practice',
+   tutorial:`Claude Code — агент, не чат-бот. Он выполняет действия.
+
+В этом терминале ты можешь симулировать работу:
+
+  \x1b[36mls ai-mindset-2026/\x1b[0m  — структура team vault
+  \x1b[36mls .claude/skills/\x1b[0m   — все скиллы
+  \x1b[36mcat CLAUDE.md\x1b[0m        — конституция агента
+
+Ключевое: говори агенту ЧТО, не КАК.
+"Найди встречи за март" > "grep -r meeting meetings/"`},
+  {mod:'01 Fundamentals', num:'04', title:'Работа с файлами', desc:'Naming convention, создание и поиск', time:'15 мин', badge:'practice',
+   tutorial:`Naming convention AI Mindset:
+
+  \x1b[36m{project} {type} description – YYYY-MM-DD.md\x1b[0m
+
+Примеры:
+  {AIM} {research} Competitor Analysis – 2026-03-30.md
+  {AIM} {meeting} Weekly Sync – 2026-03-28.md
+  {rule} Claude Context Management Protocol.md
+
+Дата ВСЕГДА в конце. Не добавляй инструмент в имя.
+
+Попробуй: \x1b[36mls ai-mindset-2026/inbox/\x1b[0m`},
+  {mod:'01 Fundamentals', num:'05', title:'CLAUDE.md — конституция', desc:'Project memory, auto memory, правила', time:'15 мин', badge:'theory',
+   tutorial:`CLAUDE.md — файл правил, который агент читает при запуске.
+
+  \x1b[36mcat CLAUDE.md\x1b[0m  — посмотри содержимое
+
+Что включить:
+  • Naming convention
+  • Структура папок
+  • Роли команды
+  • Стиль коммуникации
+  • Запреты (каналы Telegram, etc.)
+
+Помимо CLAUDE.md агент ведёт auto memory:
+  \x1b[36mls .claude/memory/\x1b[0m`},
+  {mod:'02 Skills & MCP', num:'06', title:'Создание скилла', desc:'Markdown skill files, три уровня', time:'20 мин', badge:'practice',
+   tutorial:`Скилл = markdown-файл с инструкциями. Вызов: /имя
+
+Три уровня:
+  \x1b[36mGlobal\x1b[0m  ~/.claude/skills/     — все проекты
+  \x1b[36mTeam\x1b[0m    aim-rules/skills/     — команда AIM
+  \x1b[36mLocal\x1b[0m   .claude/skills/        — этот проект
+
+Попробуй запустить скиллы:
+  \x1b[36m/pos-audit\x1b[0m
+  \x1b[36m/daily-focus\x1b[0m
+  \x1b[36m/AIM-pm\x1b[0m
+  \x1b[36m/help\x1b[0m  — полный список`},
+  {mod:'02 Skills & MCP', num:'07', title:'MCP серверы', desc:'Linear, Telegram, Exa, Notion, Sheets', time:'20 мин', badge:'theory',
+   tutorial:`MCP (Model Context Protocol) — подключение внешних систем.
+
+  \x1b[36mcat .claude/mcp.json\x1b[0m  — конфигурация
+
+7 серверов команды AIM:
+  linear     — задачи, проекты
+  telegram   — сообщения, чаты
+  exa        — семантический поиск
+  notion     — страницы, базы
+  sheets     — Google Sheets
+  krisp      — встречи, транскрипты
+  playwright — браузерная автоматизация
+
+API ключи в mcp.json — НЕ в git!`},
+  {mod:'03 Team Workflows', num:'08', title:'Morning Brief & VOX', desc:'Утренний ритуал с агентом', time:'15 мин', badge:'practice',
+   tutorial:`Утренний контекст дня:
+
+  \x1b[36m/pos-morning\x1b[0m   — calendar + Linear + sessions
+  \x1b[36m/daily-focus\x1b[0m   — одна фраза + Telegram
+  \x1b[36m/vox\x1b[0m           — полный plan с приоритетами
+  \x1b[36m/calendar\x1b[0m      — Google Calendar events
+
+Попробуй каждый — они показывают реальные данные.`},
+  {mod:'03 Team Workflows', num:'09', title:'Linear Integration', desc:'Tasks, updates, ambient layer', time:'15 мин', badge:'practice',
+   tutorial:`Linear Awareness Layer — фоновое отслеживание задач.
+
+  \x1b[36m/linear-action\x1b[0m — синтаксис действий
+
+В footer каждого ответа:
+  ▫ linear: AIM-2054 · BOS speakers · ◐ IP
+
+Символы: ○ Todo · ◐ In Progress · ◑ Review · ● Done
+
+Попробуй: \x1b[36m/AIM-pm\x1b[0m — dashboard команды`},
+  {mod:'03 Team Workflows', num:'10', title:'Telegram & Communication', desc:'Стиль AIM, отправка сообщений', time:'15 мин', badge:'theory',
+   tutorial:`Стиль AI Mindset Project Communication:
+
+  • строчная буква в начале
+  • без эмоджи
+  • EN DASH (–) вместо тире
+  • конкретно: кто, что, когда, ссылка
+  • без корпоративщины
+
+Запрещено: канал AI Mindset (ID: 1877517944)
+При сомнении → Saved Messages
+
+  \x1b[36m/content-voice\x1b[0m — проверка текста`},
+  {mod:'04 Advanced', num:'11', title:'Субагенты', desc:'Параллельная работа, delegation', time:'15 мин', badge:'advanced',
+   tutorial:`Субагенты — параллельные процессы.
+
+  \x1b[36m/research\x1b[0m      — 3 Exa sub-agents
+  \x1b[36m/ceo-council\x1b[0m   — 4 expert perspectives
+
+Когда использовать:
+  ✓ Задачи независимы (разные источники)
+  ✓ Можно синтезировать результаты
+  ✗ Задачи зависят друг от друга
+
+Попробуй: \x1b[36m/research\x1b[0m и \x1b[36m/ceo-council\x1b[0m`},
+  {mod:'04 Advanced', num:'12', title:'Hooks & Automations', desc:'SessionStart, PreToolUse, cron', time:'15 мин', badge:'advanced',
+   tutorial:`Hooks — автоматические реакции на события.
+
+  SessionStart  — при запуске (linear cache, cleanup)
+  PreToolUse    — перед инструментом (валидация)
+  PostToolUse   — после (логирование)
+  Stop          — при завершении (save state)
+
+Ambient layers строятся на hooks:
+  • Linear Awareness — кэш задач при старте
+  • Telegram cleanup — очистка temp файлов
+  • Shepherd — progress tracking`},
+  {mod:'04 Advanced', num:'13', title:'Personal Operating System', desc:'Собираем POS из компонентов', time:'20 мин', badge:'advanced',
+   tutorial:`POS — конечная цель: персональная операционная система.
+
+  \x1b[36m/pos-audit\x1b[0m     — текущий score (0-12)
+  \x1b[36m/pos-setup\x1b[0m     — 6-phase pipeline с нуля
+
+Компоненты:
+  1. CLAUDE.md     — правила
+  2. Skills        — 3-5 частых операций
+  3. MCP           — Linear + Telegram
+  4. Memory        — ключевые решения
+  5. Hooks         — автоматизация рутины
+  6. Iterate       — добавлять по мере работы
+
+Философия: начни с малого, расти по потребности.
+
+Запусти \x1b[36m/pos-audit\x1b[0m чтобы увидеть полную картину.`}
+];
+
+// ============================================================
+// XTERM TERMINAL
+// ============================================================
+let term, fitAddon, cwd = '~', cmdBuffer = '', historyArr = [], historyIdx = -1;
+
+function initTerminal() {
+  term = new window.Terminal({
+    theme: {
+      background: '#0a0a12',
+      foreground: '#e8e8ef',
+      cursor: '#4dc9d4',
+      cursorAccent: '#0a0a12',
+      selectionBackground: 'rgba(77,201,212,0.25)',
+      black: '#0a0a12',
+      red: '#ef4444',
+      green: '#22c55e',
+      yellow: '#f59e0b',
+      blue: '#3b82f6',
+      magenta: '#a78bfa',
+      cyan: '#4dc9d4',
+      white: '#e8e8ef',
+      brightBlack: '#3a3a4a',
+      brightRed: '#f87171',
+      brightGreen: '#4ade80',
+      brightYellow: '#fbbf24',
+      brightBlue: '#60a5fa',
+      brightMagenta: '#c4b5fd',
+      brightCyan: '#67e8f9',
+      brightWhite: '#ffffff'
+    },
+    fontFamily: "'IBM Plex Mono', 'SF Mono', 'Fira Code', monospace",
+    fontSize: 14,
+    lineHeight: 1.4,
+    cursorBlink: true,
+    cursorStyle: 'bar',
+    scrollback: 1000,
+    allowProposedApi: true
+  });
+
+  fitAddon = new window.FitAddon.FitAddon();
+  term.loadAddon(fitAddon);
+  term.loadAddon(new window.WebLinksAddon.WebLinksAddon());
+  term.open(document.getElementById('mainTerminal'));
+  fitAddon.fit();
+
+  const sz = document.getElementById('termSize');
+  sz.textContent = `${term.cols}x${term.rows}`;
+
+  window.addEventListener('resize', () => {
+    fitAddon.fit();
+    sz.textContent = `${term.cols}x${term.rows}`;
+  });
+
+  // Welcome
+  term.writeln('\x1b[36m');
+  term.writeln('  ╭──────────────────────────────────────────╮');
+  term.writeln('  │  \x1b[1mClaude Code Lab\x1b[0m\x1b[36m — AI Mindset            │');
+  term.writeln('  │                                          │');
+  term.writeln('  │  Interactive terminal with real vault     │');
+  term.writeln('  │  structure and working skills.            │');
+  term.writeln('  │                                          │');
+  term.writeln('  │  Type \x1b[1m\x1b[33mhelp\x1b[0m\x1b[36m to start.                     │');
+  term.writeln('  ╰──────────────────────────────────────────╯');
+  term.writeln('\x1b[0m');
+
+  prompt();
+
+  // Key handler
+  term.onKey(({key, domEvent}) => {
+    const ev = domEvent;
+    const code = ev.keyCode;
+
+    if (code === 13) { // Enter
+      term.writeln('');
+      const cmd = cmdBuffer.trim();
+      cmdBuffer = '';
+      if (cmd) {
+        historyArr.unshift(cmd);
+        historyIdx = -1;
+        executeCommand(cmd);
+      } else {
+        prompt();
+      }
+    } else if (code === 8 || code === 127) { // Backspace
+      if (cmdBuffer.length > 0) {
+        cmdBuffer = cmdBuffer.slice(0, -1);
+        term.write('\b \b');
+      }
+    } else if (code === 38) { // Up
+      if (historyIdx < historyArr.length - 1) {
+        historyIdx++;
+        replaceInput(historyArr[historyIdx]);
+      }
+    } else if (code === 40) { // Down
+      if (historyIdx > 0) {
+        historyIdx--;
+        replaceInput(historyArr[historyIdx]);
+      } else if (historyIdx === 0) {
+        historyIdx = -1;
+        replaceInput('');
+      }
+    } else if (code === 9) { // Tab
+      ev.preventDefault();
+      tabComplete();
+    } else if (ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey) {
+      cmdBuffer += ev.key;
+      term.write(ev.key);
+    } else if (ev.ctrlKey && ev.key === 'c') {
+      cmdBuffer = '';
+      term.writeln('^C');
+      prompt();
+    } else if (ev.ctrlKey && ev.key === 'l') {
+      term.clear();
+      prompt();
+    }
+  });
+
+  // Paste support
+  term.onData(data => {
+    // Handle paste (multi-char data that isn't a control sequence)
+    if (data.length > 1 && !data.startsWith('\x1b')) {
+      const clean = data.replace(/[\r\n]/g, '');
+      cmdBuffer += clean;
+      term.write(clean);
+    }
+  });
+}
+
+function replaceInput(text) {
+  // Clear current input
+  while (cmdBuffer.length > 0) {
+    term.write('\b \b');
+    cmdBuffer = cmdBuffer.slice(0, -1);
+  }
+  cmdBuffer = text;
+  term.write(text);
+}
+
+function prompt() {
+  const short = cwd === '~' ? '~' : cwd.split('/').pop();
+  term.write(`\x1b[36m${short} $\x1b[0m `);
+}
+
+function tabComplete() {
+  const parts = cmdBuffer.split(' ');
+  const last = parts[parts.length - 1];
+
+  if (last.startsWith('/')) {
+    // Skill completion
+    const prefix = last.slice(1).toLowerCase();
+    const matches = Object.keys(SKILLS).filter(s => s.toLowerCase().startsWith(prefix));
+    if (matches.length === 1) {
+      const completion = '/' + matches[0];
+      const added = completion.slice(last.length);
+      cmdBuffer += added;
+      term.write(added);
+    } else if (matches.length > 1) {
+      term.writeln('');
+      term.writeln(matches.map(m => `  \x1b[36m/${m}\x1b[0m`).join('  '));
+      prompt();
+      term.write(cmdBuffer);
+    }
+  } else {
+    // Path completion
+    const node = resolveDir(last || cwd);
+    if (node && node.type === 'dir') {
+      term.writeln('');
+      node.children.forEach(c => {
+        const color = c.endsWith('/') ? '\x1b[36m' : '\x1b[0m';
+        term.writeln(`  ${color}${c}\x1b[0m`);
+      });
+      prompt();
+      term.write(cmdBuffer);
+    }
+  }
+}
+
+function resolvePath(p) {
+  if (!p) return cwd;
+  if (p === '~' || p === '~/') return '~';
+  if (p === '..') {
+    const parts = cwd.split('/');
+    parts.pop();
+    return parts.join('/') || '~';
+  }
+  if (p.startsWith('~/')) return p.replace(/\/$/,'');
+  if (p.startsWith('/')) return p.replace(/\/$/,'');
+  const full = cwd + '/' + p;
+  return full.replace(/\/$/,'');
+}
+
+function resolveDir(p) {
+  const path = resolvePath(p);
+  // Try exact
+  if (FS[path]) return FS[path];
+  // Try with trailing slash
+  if (FS[path + '/']) return FS[path + '/'];
+  return null;
+}
+
+// ============================================================
+// COMMAND EXECUTION
+// ============================================================
+function executeCommand(raw) {
+  const parts = raw.split(/\s+/);
+  const cmd = parts[0];
+  const args = parts.slice(1).join(' ');
+
+  // Skill commands
+  if (cmd.startsWith('/')) {
+    const skillName = cmd.slice(1);
+    if (skillName === 'help' || cmd === 'help') {
+      showHelp();
+    } else if (SKILLS[skillName]) {
+      typeWriter(SKILLS[skillName].demo || `\x1b[36mSkill /${skillName} activated.\x1b[0m\nProvide input to continue.`, () => prompt());
+      return;
+    } else {
+      term.writeln(`\x1b[31mSkill not found: ${cmd}\x1b[0m`);
+      term.writeln(`Type \x1b[36m/help\x1b[0m to see available skills.`);
+    }
+    prompt();
+    return;
+  }
+
+  switch (cmd) {
+    case 'help':
+      showHelp();
+      prompt();
+      break;
+
+    case 'ls': {
+      const target = args || cwd;
+      const node = resolveDir(target);
+      if (!node || node.type !== 'dir') {
+        // Try as file
+        const fpath = resolvePath(target);
+        if (FS[fpath] && FS[fpath].type === 'file') {
+          term.writeln(fpath.split('/').pop());
+        } else {
+          term.writeln(`\x1b[31mls: ${target}: No such directory\x1b[0m`);
+        }
+      } else {
+        const cols = term.cols || 80;
+        node.children.forEach(c => {
+          if (c.endsWith('/')) {
+            term.writeln(`\x1b[36m${c}\x1b[0m`);
+          } else if (c.startsWith('...')) {
+            term.writeln(`\x1b[90m${c}\x1b[0m`);
+          } else {
+            term.writeln(c);
+          }
+        });
+      }
+      prompt();
+      break;
+    }
+
+    case 'cd': {
+      if (!args || args === '~') { cwd = '~'; prompt(); break; }
+      const target = resolvePath(args);
+      if (resolveDir(target)) {
+        cwd = target;
+      } else {
+        term.writeln(`\x1b[31mcd: ${args}: No such directory\x1b[0m`);
+      }
+      prompt();
+      break;
+    }
+
+    case 'pwd':
+      term.writeln(cwd.replace('~', '/Users/alex/Library/CloudStorage/Dropbox/notes'));
+      prompt();
+      break;
+
+    case 'cat': {
+      const fpath = resolvePath(args);
+      if (FS[fpath] && FS[fpath].type === 'file') {
+        term.writeln(FS[fpath].content);
+      } else {
+        term.writeln(`\x1b[31mcat: ${args}: No such file\x1b[0m`);
+      }
+      prompt();
+      break;
+    }
+
+    case 'tree': {
+      const target = args || cwd;
+      const node = resolveDir(target);
+      if (!node) { term.writeln(`\x1b[31mtree: ${target}: Not found\x1b[0m`); prompt(); break; }
+      printTree(target, node, '', true);
+      prompt();
+      break;
+    }
+
+    case 'claude': {
+      if (args === '--version') {
+        term.writeln('claude-code 1.0.34');
+      } else if (args === '--help' || args === '-h') {
+        term.writeln(`Usage: claude [options] [prompt]
+
+Options:
+  --version        Show version number
+  --continue, -c   Continue most recent conversation
+  --resume, -r     Resume a specific session
+  --model          Set model (opus/sonnet/haiku)
+  --verbose        Enable verbose logging
+  --help           Show help
+
+Models: claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5`);
+      } else if (args === 'login') {
+        typeWriter(`Opening browser for authentication...
+\x1b[32m✓ Authenticated as alex@aimindset.org\x1b[0m
+  Plan: Claude Max
+  Model: claude-opus-4-6 (1M context)`, () => prompt());
+        return;
+      } else {
+        term.writeln('');
+        term.writeln('  \x1b[36m╭─────────────────────────────────────╮\x1b[0m');
+        term.writeln('  \x1b[36m│\x1b[0m  \x1b[1mClaude Code\x1b[0m v1.0.34               \x1b[36m│\x1b[0m');
+        term.writeln('  \x1b[36m│\x1b[0m  Model: claude-opus-4-6             \x1b[36m│\x1b[0m');
+        term.writeln('  \x1b[36m│\x1b[0m  Context: 1M tokens                 \x1b[36m│\x1b[0m');
+        term.writeln('  \x1b[36m╰─────────────────────────────────────╯\x1b[0m');
+        term.writeln('');
+        term.writeln('  Type your message or /help');
+      }
+      prompt();
+      break;
+    }
+
+    case 'npm': {
+      if (raw.includes('install') && raw.includes('claude-code')) {
+        typeWriter(`\x1b[90madded 1 package in 12s\x1b[0m
+
+\x1b[32m+ @anthropic-ai/claude-code@1.0.34\x1b[0m
+\x1b[90minstalled to /opt/homebrew/bin/claude\x1b[0m`, () => prompt());
+        return;
+      }
+      term.writeln(`npm: simulated — try: npm install -g @anthropic-ai/claude-code`);
+      prompt();
+      break;
+    }
+
+    case 'clear':
+      term.clear();
+      prompt();
+      break;
+
+    case 'whoami':
+      term.writeln('alex — Founder & Vision Lead, AI Mindset');
+      prompt();
+      break;
+
+    case 'date':
+      term.writeln('Sun Mar 30 2026 — Week 14');
+      prompt();
+      break;
+
+    case 'lesson': {
+      const idx = parseInt(args) - 1;
+      if (idx >= 0 && idx < LESSONS.length) {
+        const l = LESSONS[idx];
+        term.writeln('');
+        term.writeln(`\x1b[36m━━━ Lesson ${l.num}: ${l.title} ━━━━━━━━━━━━━━━\x1b[0m`);
+        term.writeln(`\x1b[90m${l.mod} · ${l.time}\x1b[0m`);
+        term.writeln('');
+        term.writeln(l.tutorial);
+        term.writeln('');
+      } else {
+        term.writeln('Usage: lesson <number>  (1-13)');
+        term.writeln('');
+        LESSONS.forEach((l,i) => {
+          term.writeln(`  \x1b[36m${String(i+1).padStart(2)}\x1b[0m  ${l.title}\x1b[90m  (${l.time})\x1b[0m`);
+        });
+      }
+      prompt();
+      break;
+    }
+
+    default:
+      // Check if it's a question/prompt for Claude
+      if (raw.length > 20 || raw.includes('найди') || raw.includes('покажи') || raw.includes('создай')) {
+        typeWriter(`\x1b[36mClaude >\x1b[0m Processing: "${raw.slice(0,50)}${raw.length>50?'...':''}"
+
+\x1b[33mThis is a demo terminal.\x1b[0m In real Claude Code, this prompt would:
+  1. Analyze your request
+  2. Choose appropriate tools (Read, Edit, Bash, MCP...)
+  3. Execute actions on real files
+  4. Return results
+
+Try these real commands: \x1b[36mls\x1b[0m, \x1b[36mcat CLAUDE.md\x1b[0m, \x1b[36m/pos-audit\x1b[0m, \x1b[36mlesson 1\x1b[0m`, () => prompt());
+        return;
+      }
+      term.writeln(`\x1b[31mcommand not found:\x1b[0m ${cmd}`);
+      term.writeln(`\x1b[90mtry: help, ls, cd, cat, tree, claude, lesson, /skill-name\x1b[0m`);
+      prompt();
+  }
+}
+
+function showHelp() {
+  term.writeln(`
+\x1b[1m\x1b[36mClaude Code Lab — Commands\x1b[0m
+
+\x1b[33mNavigation:\x1b[0m
+  ls [path]      List directory
+  cd <path>      Change directory
+  pwd            Print working directory
+  tree [path]    Show directory tree
+  cat <file>     Read file contents
+  clear          Clear terminal
+
+\x1b[33mClaude Code:\x1b[0m
+  claude         Launch Claude Code
+  claude --help  Show Claude options
+  claude login   Authenticate
+
+\x1b[33mLessons:\x1b[0m
+  lesson         List all lessons
+  lesson <n>     Open lesson by number
+
+\x1b[33mSkills (${Object.keys(SKILLS).length} available):\x1b[0m`);
+
+  const cats = {};
+  Object.entries(SKILLS).forEach(([name, s]) => {
+    if (!cats[s.cat]) cats[s.cat] = [];
+    cats[s.cat].push(name);
+  });
+  Object.entries(cats).forEach(([cat, skills]) => {
+    term.writeln(`  \x1b[33m${cat}:\x1b[0m`);
+    skills.forEach(s => {
+      term.writeln(`    \x1b[36m/${s.padEnd(22)}\x1b[0m \x1b[90m${SKILLS[s].desc.slice(0,45)}\x1b[0m`);
+    });
+  });
+
+  term.writeln(`
+\x1b[90mTab\x1b[0m — autocomplete  \x1b[90m↑↓\x1b[0m — history  \x1b[90mCtrl+L\x1b[0m — clear  \x1b[90mCtrl+C\x1b[0m — cancel`);
+}
+
+function printTree(path, node, prefix, isLast) {
+  const name = path.split('/').pop() || path;
+  const isDir = node.type === 'dir';
+  term.writeln(`${prefix}${isDir ? '\x1b[36m' : ''}${name}${isDir ? '/\x1b[0m' : ''}`);
+
+  if (isDir && node.children) {
+    const children = node.children.filter(c => !c.startsWith('...'));
+    children.forEach((child, i) => {
+      const isChildLast = i === children.length - 1;
+      const childPath = path + '/' + child.replace(/\/$/,'');
+      const childNode = FS[childPath] || FS[childPath + '/'] || {type: child.endsWith('/') ? 'dir' : 'file'};
+      const connector = isChildLast ? '└── ' : '├── ';
+      const nextPrefix = prefix + (isChildLast ? '    ' : '│   ');
+
+      if (childNode.type === 'dir' && (FS[childPath] || FS[childPath + '/'])) {
+        term.write(`${prefix}${connector}`);
+        printTree(childPath, FS[childPath] || FS[childPath + '/'], '', isChildLast);
+      } else {
+        const color = child.endsWith('/') ? '\x1b[36m' : '';
+        const reset = color ? '\x1b[0m' : '';
+        term.writeln(`${prefix}${connector}${color}${child}${reset}`);
+      }
+    });
+  }
+}
+
+function typeWriter(text, callback, speed = 8) {
+  const lines = text.split('\n');
+  let lineIdx = 0;
+
+  function nextLine() {
+    if (lineIdx >= lines.length) {
+      if (callback) callback();
+      return;
+    }
+    term.writeln(lines[lineIdx]);
+    lineIdx++;
+    setTimeout(nextLine, 30 + Math.random() * 20);
+  }
+  nextLine();
+}
+
+// ============================================================
+// TAB NAVIGATION
+// ============================================================
+function switchTab(id) {
+  document.querySelectorAll('.topnav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+  document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'tab-' + id));
+
+  if (id === 'terminal') {
+    setTimeout(() => { fitAddon.fit(); term.focus(); }, 50);
+  }
+}
+
+// ============================================================
+// RENDER LESSONS
+// ============================================================
+function renderLessons() {
+  const grid = document.getElementById('lessonsGrid');
+  let currentMod = '';
+  let html = '';
+
+  LESSONS.forEach((l, i) => {
+    if (l.mod !== currentMod) {
+      if (currentMod) html += '</div><div style="height:32px"></div>';
+      currentMod = l.mod;
+      html += `<div style="grid-column:1/-1"><div class="section-label" style="margin-top:24px">Module ${l.mod}</div></div><div class="lesson-grid" style="grid-column:1/-1">`;
+    }
+
+    const badgeClass = l.badge === 'practice' ? 'badge-practice' : l.badge === 'advanced' ? 'badge-advanced' : 'badge-theory';
+    html += `
+      <div class="lesson-card" onclick="startLesson(${i+1})">
+        <div class="lesson-num">${l.num}</div>
+        <div class="lesson-title">${l.title}</div>
+        <div class="lesson-desc">${l.desc}</div>
+        <div class="lesson-meta">
+          <span class="lesson-time">${l.time}</span>
+          <span class="lesson-badge ${badgeClass}">${l.badge}</span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function startLesson(n) {
+  switchTab('terminal');
+  setTimeout(() => {
+    cmdBuffer = `lesson ${n}`;
+    term.write(`lesson ${n}`);
+    executeCommand(`lesson ${n}`);
+    cmdBuffer = '';
+  }, 100);
+}
+
+// ============================================================
+// RENDER SKILLS CATALOG
+// ============================================================
+function renderSkills() {
+  const catalog = document.getElementById('skillsCatalog');
+  const cats = {};
+  Object.entries(SKILLS).forEach(([name, s]) => {
+    if (!cats[s.cat]) cats[s.cat] = [];
+    cats[s.cat].push({name, ...s});
+  });
+
+  let html = '';
+  Object.entries(cats).forEach(([cat, skills]) => {
+    html += `<div class="skill-cat"><div class="skill-cat-label">${cat}</div></div><div class="skill-grid">`;
+    skills.forEach(s => {
+      html += `
+        <div class="skill-item" onclick="runSkill('${s.name}')">
+          <div class="skill-cmd">/${s.name}</div>
+          <div class="skill-desc">${s.desc}</div>
+        </div>`;
+    });
+    html += '</div>';
+  });
+  catalog.innerHTML = html;
+}
+
+function runSkill(name) {
+  switchTab('terminal');
+  setTimeout(() => {
+    cmdBuffer = '/' + name;
+    term.write('/' + name);
+    executeCommand('/' + name);
+    cmdBuffer = '';
+  }, 100);
+}
+
+// ============================================================
+// RENDER VAULT TREE
+// ============================================================
+function renderVaultTree() {
+  const tree = document.getElementById('vaultTree');
+  const lines = [
+    ['~/ai-mindset-2026/', 'team vault — 11,865 docs'],
+    ['  AGENTS.md', 'индекс для агентов'],
+    ['  aim-rules/', 'правила, стандарты, скиллы'],
+    ['    skills/', '24 командных AIM-* скилла'],
+    ['    marketing/', 'маркетинг правила'],
+    ['    rules_tech/', 'технические стандарты'],
+    ['    rules_visuals/', 'визуальные стандарты'],
+    ['  inbox/', 'research, analysis, overview'],
+    ['    logs/', 'логи изменений'],
+    ['  meetings/', 'встречи, транскрипты'],
+    ['    one-on-one/', '1-1 встречи'],
+    ['    weekly-syncs/', 'еженедельные синки'],
+    ['  Labs/', 'когорты лабораторий'],
+    ['    s1 – POS sprint/', 'Personal OS Sprint'],
+    ['    s2 – ai-native sprint/', 'AI-Native Organizations'],
+    ['    s3 – self-dev sprint/', 'Self-Development Sprint'],
+    ['    w26/', 'Winter 2026 cohort'],
+    ['    x26 – spring lab/', 'Spring 2026 lab'],
+    ['  Org/', 'организационная структура'],
+    ['    HR/', 'роли команды (8 человек)'],
+    ['    Partners/', 'партнёры и CRM'],
+    ['    Processes/', 'процессы и процедуры'],
+    ['    Marketing&Sales/', 'маркетинг и продажи'],
+    ['  Products Ecosystem/', 'продукты'],
+    ['    Space/', 'AI Mindset Space'],
+    ['    Circle/', 'Circle community'],
+    ['    B2B/', 'корпоративные проекты'],
+    ['    Gershuni Partnership/', 'партнёрство с Гершуни'],
+    ['', ''],
+    ['~/.claude/', 'Claude Code config'],
+    ['  skills/', '44 глобальных скилла'],
+    ['  memory/', '23 записи auto-memory'],
+    ['  settings.json', 'permissions, hooks, model'],
+    ['  mcp.json', '7 MCP серверов'],
+    ['  evals/', 'rubric + log + improvements'],
+    ['', ''],
+    ['~/notes/', 'personal vault'],
+    ['  rules/', '47 правил и стандартов'],
+    ['  _inbox/', 'входящие материалы'],
+    ['  transcripts/', 'транскрипты сессий'],
+    ['  articles/', 'статьи и посты'],
+    ['  tasks/', 'задачи и трекинг'],
+    ['  scripts/', 'автоматизации'],
+    ['  code tools/', 'утилиты vault'],
+  ];
+
+  tree.innerHTML = lines.map(([path, comment]) => {
+    if (!path) return '<br>';
+    const isDir = path.trimStart().endsWith('/');
+    const indent = path.length - path.trimStart().length;
+    const name = path.trimStart();
+    return `<div style="margin-left:${indent * 10}px"><span class="${isDir ? 'tree-dir' : ''}">${name}</span>${comment ? `<span class="tree-comment">← ${comment}</span>` : ''}</div>`;
+  }).join('');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initTerminal();
+  renderLessons();
+  renderSkills();
+  renderVaultTree();
+});
+</script>
+
+</body>
+</html>
