@@ -137,6 +137,27 @@
     .onboard-hint .hint-close{position:absolute;top:8px;right:10px;cursor:pointer;color:var(--text-label);font-size:0.8rem}
     @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
+    /* FLASHCARDS (ANKI) */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .flashcard{perspective:800px;height:200px;cursor:pointer}
+    .flashcard-inner{position:relative;width:100%;height:100%;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d}
+    .flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
+    .flashcard-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:6px;padding:20px;display:flex;flex-direction:column;justify-content:center}
+    .flashcard-front{background:linear-gradient(135deg,var(--bg-card) 0%,rgba(77,201,212,0.06) 100%);border:1px solid var(--border)}
+    .flashcard-front:hover{border-color:var(--teal-dim);box-shadow:0 0 24px rgba(77,201,212,0.08)}
+    .flashcard-back{background:linear-gradient(135deg,rgba(77,201,212,0.08) 0%,var(--bg-card) 100%);border:1px solid var(--teal-dim);transform:rotateY(180deg)}
+    .flashcard-cat{font-size:0.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--amber);margin-bottom:8px}
+    .flashcard-q{font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.4;color:var(--text)}
+    .flashcard-a{font-size:0.8rem;line-height:1.6;color:var(--text-dim)}
+    .flashcard-a code{color:var(--teal);background:rgba(77,201,212,0.1);padding:1px 5px;border-radius:2px;font-size:0.75rem}
+    .flashcard-a strong{color:var(--text);font-weight:500}
+    .flashcard-hint{font-size:0.6rem;color:var(--text-label);text-align:center;margin-top:8px;letter-spacing:1px}
+    .cards-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+    .cards-filter-btn{font-family:var(--mono);font-size:0.65rem;padding:6px 12px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);transition:all .2s;text-transform:uppercase;letter-spacing:1px}
+    .cards-filter-btn:hover{border-color:var(--teal-dim);color:var(--text)}
+    .cards-filter-btn.active{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
+    .cards-counter{font-size:0.65rem;color:var(--text-label);margin-bottom:16px}
+
     /* FOOTER */
     .site-footer{padding:24px 0;border-top:1px solid var(--border);text-align:center;font-size:0.6rem;color:var(--text-label);letter-spacing:1px}
 
@@ -164,6 +185,7 @@
         <div class="topnav-tab" data-tab="lessons" onclick="switchTab('lessons')">Lessons</div>
         <div class="topnav-tab" data-tab="skills" onclick="switchTab('skills')">Skills</div>
         <div class="topnav-tab" data-tab="vault" onclick="switchTab('vault')">Vault</div>
+        <div class="topnav-tab" data-tab="cards" onclick="switchTab('cards')">Cards</div>
       </div>
       <div class="topnav-progress" id="navProgress">0/13</div>
     </div>
@@ -178,7 +200,7 @@
     <h1>Learn by Doing</h1>
     <p class="hero-sub">Живой терминал. Реальная структура vault. Настоящие скиллы. Вводи команды — учись на практике.</p>
     <div class="hero-stats">
-      <div><span class="stat-val">60+</span>skills</div>
+      <div><span class="stat-val">21</span>skills</div>
       <div><span class="stat-val">7</span>MCP servers</div>
       <div><span class="stat-val">13</span>lessons</div>
     </div>
@@ -228,6 +250,17 @@
     <div id="skillsCatalog"></div>
   </section>
 
+  <!-- TAB: CARDS -->
+  <section class="section" id="tab-cards">
+    <div class="section-title">Flashcards</div>
+    <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:16px;font-weight:300">
+      Кликни на карточку чтобы перевернуть. Ключевые концепции Claude Code для запоминания.
+    </p>
+    <div class="cards-filter" id="cardsFilter"></div>
+    <div class="cards-counter" id="cardsCounter"></div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </section>
+
   <!-- TAB: VAULT -->
   <section class="section" id="tab-vault">
     <div class="section-title">Структура Vault</div>
@@ -260,13 +293,13 @@ const FS = {
 | Person | Role                    |
 |--------|-------------------------|
 | Alex   | Founder & Vision Lead   |
-| Ira    | Operations              |
-| Vlada  | Partnerships            |
-| Dan    | Tech                    |
-| Katya  | Content & Design        |
-| Olya   | Operations, POS         |
-| Lena   | PM Coordinator          |
-| Karina | (newest)                |
+| Ira N. | Operations Partner      |
+| Ira P. | Circle & Community Lead |
+| Vlada  | Partnerships & Growth   |
+| Dan    | Tech Lead               |
+| Katya  | Content & Marketing     |
+| Olya   | Community Manager       |
+| Karina | Program Coordinator     |
 
 ## MCP Telegram — Rules
 - NEVER send to AI Mindset channel (ID: 1877517944)
@@ -300,7 +333,7 @@ const FS = {
   '~/ai-mindset-2026/meetings/': {type:'dir', children:['one-on-one/','weekly-syncs/','{meeting} AIM Marketing Weekly Sync – 2026-01-08.md','{transcript} {krisp} AI mindset weekly – 2026-03-28.md','...64 more files']},
   '~/ai-mindset-2026/Labs/': {type:'dir', children:['s1 – POS sprint/','s2 – ai-native sprint/','s3 – self-dev sprint/','w26/','x26 – spring lab/','auto02/','Pitch Lab/','demodays/','_passed labs/']},
   '~/ai-mindset-2026/Org/': {type:'dir', children:['HR/','Partners/','Processes/','Marketing&Sales/','infrastructure/','Curators/','offers/']},
-  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Lena Korchemagina.md','{role} Karina Vantslav.md']},
+  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Irina Porokhovnikova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Karina Vantslav.md','archive/']},
   '~/ai-mindset-2026/Products Ecosystem/': {type:'dir', children:['Space/','Circle/','B2B/','Borodich Ventures/','Gershuni Partnership/','infrastructure МС/']},
 };
 
@@ -401,12 +434,13 @@ content calendar draft, partnership call.
 \x1b[1mTeam Status (30 марта):\x1b[0m
 
   Alex   \x1b[32m●\x1b[0m  5 IP tasks — Claude Code Lab, Ops Metrics
-  Ira    \x1b[32m●\x1b[0m  3 IP tasks — POS Sprint closing, scheduling
+  Ira N. \x1b[32m●\x1b[0m  3 IP tasks — POS Sprint closing, scheduling
+  Ira P. \x1b[36m◈\x1b[0m  2 IP tasks — Circle audit, peer groups
   Dan    \x1b[32m●\x1b[0m  4 IP tasks — Infrastructure, monorepo
   Katya  \x1b[33m◐\x1b[0m  2 IP tasks — Content calendar, carousel
   Olya   \x1b[32m●\x1b[0m  3 IP tasks — POS ops, sprint monitor
   Vlada  \x1b[32m●\x1b[0m  2 IP tasks — CloudRu, Borodich
-  Lena   \x1b[32m●\x1b[0m  3 IP tasks — PM coordination, Lab schedule
+  Karina \x1b[32m●\x1b[0m  3 IP tasks — Lab coordination, schedule
 
 \x1b[33mBlocked:\x1b[0m 0
 \x1b[33mOverdue:\x1b[0m 1 (Content calendar — Katya, due yesterday)
@@ -572,21 +606,38 @@ Provide:
 
 \x1b[33mWho needs an intro and where?\x1b[0m`},
 
-  'AIM-carousel': {cat:'Content', desc:'Instagram carousel/stories generation — 7 styles', demo:`\x1b[36m━━━ AIM Carousel Generator ━━━━━━━━━━━\x1b[0m
+  'AIM-crm': {cat:'Team', desc:'Partner & member CRM — contacts, tags, pipeline', demo:`\x1b[36m━━━ AIM CRM Dashboard ━━━━━━━━━━━━━━━━\x1b[0m
 
-Available styles:
-  1. \x1b[36mbrutalist\x1b[0m      — raw, bold, high contrast
-  2. \x1b[36mcollage\x1b[0m        — mixed media, overlapping
-  3. \x1b[36meditorial\x1b[0m      — clean, magazine layout
-  4. \x1b[36mainative-teal\x1b[0m  — AI-Native Sprint brand
-  5. \x1b[36mlab-x26\x1b[0m        — spring lab aesthetic
-  6. \x1b[36mcinema-dark\x1b[0m    — amber + teal cinematic
-  7. \x1b[36mblueprint\x1b[0m      — blue technical drawings
+\x1b[1mActions:\x1b[0m
+  [1] Search contacts
+  [2] View pipeline
+  [3] Tag members
+  [4] Export segment
 
-Formats: Stories 1080x1920, Carousel 1080x1350, Banner 1500x500
-Export: 2x retina PNG + MP4
+\x1b[33mStats:\x1b[0m
+  Partners: 24 active
+  Space members: 208
+  Lab alumni: 156
+  Untagged: 12
 
-\x1b[33mProvide topic and style number:\x1b[0m`},
+\x1b[33mSearch or select action:\x1b[0m`},
+
+  'AIM-space-new-members': {cat:'Team', desc:'Weekly new members announcement for Space', demo:`\x1b[36m━━━ Space New Members ━━━━━━━━━━━━━━━━━\x1b[0m
+
+\x1b[1mNew this week:\x1b[0m 4 members
+
+  Maria K. — product manager, fintech
+  Sergey T. — CTO, startup
+  Anna V. — head of AI, consulting
+  Pavel M. — data scientist, ML ops
+
+\x1b[33mGenerating announcement for Thursday...\x1b[0m
+
+Format: bio synthesis + welcome message
+Target: AI Mindset {space} chat
+Source: Notion MCP → member profiles
+
+\x1b[33mReview and send? (y/n)\x1b[0m`},
 
   'help': {cat:'System', desc:'List all available commands and skills', demo:''}
 };
@@ -1230,6 +1281,33 @@ Next steps:
       break;
     }
 
+    case 'cards': case 'anki': case 'flashcards': {
+      const catCounts = {};
+      CARDS.forEach(c => { catCounts[c.cat] = (catCounts[c.cat] || 0) + 1; });
+      term.writeln(`\x1b[36m━━━ Flashcards ━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`);
+      term.writeln(`\x1b[1m${CARDS.length} cards\x1b[0m across ${Object.keys(catCounts).length} categories:\n`);
+      Object.entries(catCounts).forEach(([cat, n]) => {
+        term.writeln(`  \x1b[33m${cat.padEnd(16)}\x1b[0m ${n} cards`);
+      });
+      term.writeln(`\n\x1b[90mSwitch to Cards tab to practice, or use:\x1b[0m`);
+      term.writeln(`  \x1b[36mcards random\x1b[0m — show a random card`);
+      if (args === 'random' || args === 'r') {
+        const card = CARDS[Math.floor(Math.random() * CARDS.length)];
+        term.writeln(`\n\x1b[36m┌─────────────────────────────────────┐\x1b[0m`);
+        term.writeln(`\x1b[36m│\x1b[0m \x1b[33m${card.cat}\x1b[0m`);
+        term.writeln(`\x1b[36m│\x1b[0m`);
+        term.writeln(`\x1b[36m│\x1b[0m \x1b[1m${card.q}\x1b[0m`);
+        term.writeln(`\x1b[36m│\x1b[0m`);
+        const answer = card.a.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&');
+        answer.split('<br>').join('\n').split('\n').forEach(line => {
+          term.writeln(`\x1b[36m│\x1b[0m \x1b[90m${line.trim()}\x1b[0m`);
+        });
+        term.writeln(`\x1b[36m└─────────────────────────────────────┘\x1b[0m`);
+      }
+      prompt();
+      break;
+    }
+
     case 'setup': {
       typeWriter(`\x1b[36m━━━ Claude Code Setup Guide ━━━━━━━━━━━━━━━\x1b[0m
 
@@ -1263,8 +1341,8 @@ Next steps:
     case 'walkthrough': case 'walk': case 'tour': {
       if (!currentRole) {
         term.writeln('\x1b[33mВыбери роль сначала:\x1b[0m кликни на роль вверху страницы или введи:');
-        term.writeln('  \x1b[36mrole founder\x1b[0m | \x1b[36mrole operations\x1b[0m | \x1b[36mrole tech\x1b[0m | \x1b[36mrole content\x1b[0m');
-        term.writeln('  \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m | \x1b[36mrole assistant\x1b[0m');
+        term.writeln('  \x1b[36mrole founder\x1b[0m | \x1b[36mrole operations\x1b[0m | \x1b[36mrole circle\x1b[0m | \x1b[36mrole tech\x1b[0m');
+        term.writeln('  \x1b[36mrole content\x1b[0m | \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m');
         prompt();
         break;
       }
@@ -1462,6 +1540,11 @@ function showHelp() {
   progress       Show completion
   reset          Reset progress
 
+\x1b[33mFlashcards:\x1b[0m
+  cards          Show all categories
+  cards random   Random flashcard
+  anki           Alias for cards
+
 \x1b[33mGit:\x1b[0m
   git status     Working tree status
   git log        Commit history
@@ -1641,7 +1724,7 @@ function renderVaultTree() {
     ['    w26/', 'Winter 2026 cohort'],
     ['    x26 – spring lab/', 'Spring 2026 lab'],
     ['  Org/', 'организационная структура'],
-    ['    HR/', 'роли команды (8 человек)'],
+    ['    HR/', 'роли команды (8 человек) + archive'],
     ['    Partners/', 'партнёры и CRM'],
     ['    Processes/', 'процессы и процедуры'],
     ['    Marketing&Sales/', 'маркетинг и продажи'],
@@ -1695,7 +1778,7 @@ const ROLES = {
     ]
   },
   operations: {
-    name: 'Ira', title: 'Operations Partner', icon: '◇',
+    name: 'Ira N.', title: 'Operations Partner', icon: '◇',
     desc: 'Finance, HR, координация, процессы, продажи',
     skills: ['AIM-pm','calendar','pos-morning','AIM-lab','sessions','linear-action','AIM-meeting-summary'],
     walkthrough: [
@@ -1705,6 +1788,19 @@ const ROLES = {
       {cmd: '/linear-action', text: 'Linear actions — update, close, comment задачи'},
       {cmd: '/AIM-meeting-summary', text: 'Meeting summary — из транскрипта в action items'},
       {cmd: 'ls ai-mindset-2026/Org/', text: 'Организационная структура — HR, Partners, Processes'},
+    ]
+  },
+  circle: {
+    name: 'Ira P.', title: 'Circle & Community Direction', icon: '◈',
+    desc: 'Community architecture, Space audit, peer groups, events, alumni CRM',
+    skills: ['AIM-lab','AIM-space-new-members','intro','AIM-crm','content-voice','calendar','research'],
+    walkthrough: [
+      {cmd: '/AIM-lab', text: 'Lab hub — мониторинг активности сообщества'},
+      {cmd: '/AIM-space-new-members', text: 'New members — еженедельный анонс новых участников'},
+      {cmd: '/intro', text: 'Intro — генерация приветственных сообщений'},
+      {cmd: '/AIM-crm', text: 'CRM — управление контактами и тегами'},
+      {cmd: '/content-voice', text: 'Content voice — тон коммуникации в сообществе'},
+      {cmd: '/calendar', text: 'Calendar — расписание community events'},
     ]
   },
   partnerships: {
@@ -1723,7 +1819,7 @@ const ROLES = {
   tech: {
     name: 'Dan', title: 'Tech Lead', icon: '▣',
     desc: 'LMS, automation, payments, AI agents, infrastructure',
-    skills: ['pos-audit','pos-morning','sessions','linear-action','research','reflect'],
+    skills: ['pos-audit','pos-morning','sessions','linear-action','research','reflect','infocompressor'],
     walkthrough: [
       {cmd: '/pos-audit', text: 'POS audit — score инфраструктуры (CLAUDE.md, MCP, hooks)'},
       {cmd: 'cat .claude/mcp.json', text: 'MCP config — 7 серверов команды'},
@@ -1770,19 +1866,6 @@ const ROLES = {
       {cmd: '/content-voice', text: 'Content voice — проверка тона сообщений'},
       {cmd: '/calendar', text: 'Calendar — расписание community events'},
       {cmd: '/daily-focus', text: 'Daily focus — фокус на community задачи'},
-    ]
-  },
-  assistant: {
-    name: 'Lena', title: 'Business Assistant', icon: '▫',
-    desc: 'Personal ops, AIM support, speaker communication, admin',
-    skills: ['calendar','pos-morning','AIM-meeting-summary','linear-action','daily-focus','sessions'],
-    walkthrough: [
-      {cmd: '/calendar', text: 'Calendar — расписание Alex и команды'},
-      {cmd: '/pos-morning', text: 'Morning brief — контекст дня'},
-      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — итоги звонков → action items'},
-      {cmd: '/linear-action', text: 'Linear — трекинг задач'},
-      {cmd: '/daily-focus', text: 'Daily focus — планирование дня'},
-      {cmd: '/sessions', text: 'Sessions — последние сессии Claude Code'},
     ]
   }
 };
@@ -1870,6 +1953,91 @@ function runInTerminal(cmd) {
 }
 
 // ============================================================
+// FLASHCARDS (ANKI-STYLE)
+// ============================================================
+const CARDS = [
+  // Setup
+  {cat:'Setup', q:'Как установить Claude Code?', a:'<code>npm install -g @anthropic-ai/claude-code</code><br>Затем <code>claude login</code> для авторизации через браузер.'},
+  {cat:'Setup', q:'Какие 3 способа авторизации в Claude Code?', a:'<strong>1.</strong> Claude Pro/Max ($20/мес) — самый простой<br><strong>2.</strong> Console API (pay-as-you-go)<br><strong>3.</strong> Enterprise (Bedrock, Vertex, Foundry)'},
+  {cat:'Setup', q:'Что видит Claude Code при запуске?', a:'<strong>Все файлы</strong> в директории запуска и подпапках. Не запускайте из папок с секретами (.env, API ключи).'},
+  {cat:'Setup', q:'Как переключить модель?', a:'<code>/model opus</code> — максимальное качество<br><code>/model sonnet</code> — баланс<br><code>/model haiku</code> — экономия токенов'},
+
+  // Skills
+  {cat:'Skills', q:'Что такое скилл в Claude Code?', a:'<strong>Markdown-файл</strong> с YAML frontmatter (name, description) + инструкции для AI. Вызов: <code>/имя-скилла</code>'},
+  {cat:'Skills', q:'Три уровня скиллов?', a:'<strong>Global:</strong> <code>~/.claude/skills/</code> — все проекты<br><strong>Team:</strong> <code>aim-rules/skills/</code> — команда<br><strong>Local:</strong> <code>.claude/skills/</code> — этот проект'},
+  {cat:'Skills', q:'Чем скилл отличается от команды?', a:'<strong>Скиллы</strong> (новая система) работают во всех Claude-инструментах, более мощные. <strong>Команды</strong> (.claude/commands/) — устаревший формат.'},
+  {cat:'Skills', q:'Что такое Superpowers?', a:'Коллекция 30+ готовых скиллов: brainstorming, TDD, systematic-debugging, de-AI-ify. <code>github.com/obra/superpowers</code>'},
+  {cat:'Skills', q:'Паттерн WHEN/WHEN NOT в скиллах?', a:'В description указывать <strong>когда</strong> и <strong>когда НЕ</strong> использовать скилл. Помогает AI загружать только нужные скиллы (progressive disclosure).'},
+
+  // MCP
+  {cat:'MCP', q:'Что такое MCP?', a:'<strong>Model Context Protocol</strong> — стандарт подключения внешних инструментов к AI. Конфиг: <code>~/.claude/mcp.json</code>'},
+  {cat:'MCP', q:'7 MCP серверов команды AIM?', a:'<strong>linear</strong> (задачи), <strong>telegram</strong> (сообщения), <strong>exa</strong> (поиск), <strong>notion</strong> (страницы), <strong>sheets</strong> (таблицы), <strong>krisp</strong> (транскрипты), <strong>playwright</strong> (браузер)'},
+  {cat:'MCP', q:'Что такое Exa MCP?', a:'<strong>Семантический поиск</strong> в интернете для AI-агентов. 1000 бесплатных кредитов. Всегда добавлять текущую дату в запрос.'},
+  {cat:'MCP', q:'Как настроить MCP сервер?', a:'Добавить в <code>~/.claude/mcp.json</code>:<br><code>{"mcpServers": {"exa": {"command":"npx","args":[...],"env":{...}}}}</code>'},
+
+  // Workflows
+  {cat:'Workflows', q:'Утренний ритуал с Claude Code?', a:'<code>/pos-morning</code> — calendar + Linear + sessions<br><code>/daily-focus</code> — фокус дня → Telegram<br><code>/vox</code> — полный план с приоритетами'},
+  {cat:'Workflows', q:'Что такое Linear Awareness Layer?', a:'<strong>Фоновый ambient layer</strong> — автоматически связывает сессию с задачами Linear. Показывает статус в footer каждого о��вета.'},
+  {cat:'Workflows', q:'Стиль коммуникации AI Mindset?', a:'Строчная буква, <strong>без эмоджи</strong>, EN dash (–), конкретно (кто/что/когда), без корпоративщины. Референс: {rule} AI Mindset Project Communication.'},
+  {cat:'Workflows', q:'Что такое субагенты?', a:'<strong>Параллельные процессы</strong> для независимых задач. /research = 3 Exa sub-agents, /ceo-council = 4 expert perspectives. Ускорение в 3-4x.'},
+  {cat:'Workflows', q:'Как работают Hooks?', a:'Авто-реакции на события: <strong>SessionStart</strong> (при запуске), <strong>PreToolUse</strong> (перед инструментом), <strong>PostToolUse</strong> (после), <strong>Stop</strong> (при завершении).'},
+
+  // POS
+  {cat:'POS', q:'Что такое POS?', a:'<strong>Personal Operating System</strong> — персональная операционная система из 6 компонентов: CLAUDE.md, Skills, MCP, Memory, Hooks, Iterate.'},
+  {cat:'POS', q:'Что такое CLAUDE.md?', a:'<strong>Конституция агента</strong> — файл правил, который Claude читает при запуске. Naming convention, роли, запреты, стиль. Project memory.'},
+  {cat:'POS', q:'POS Score — что проверяет /pos-audit?', a:'12 компонентов: CLAUDE.md, Skills, MCP, Hooks, Memory, Context Protocol, Linear Layer, Telegram, Evals, Shepherd, QMD, Cron. Score 0-12.'},
+  {cat:'POS', q:'Философия POS?', a:'<strong>Начни с малого, расти по потребности.</strong> Не настраивай всё сразу. 1 CLAUDE.md → 3 скилла → 1 MCP → добавляй по мере работы.'},
+  {cat:'POS', q:'Naming convention AI Mindset?', a:'<code>{project} {type} description – YYYY-MM-DD.md</code><br>Дата ВСЕГДА в конце. Не добавлять инструмент в имя. Примеры: {AIM} {research}, {rule}, {meeting}.'},
+
+  // Vibe Coding
+  {cat:'Vibe Coding', q:'Что такое Vibe Coding?', a:'Разработка через <strong>коммуникацию с AI</strong> вместо написания кода вручную. Говори агенту ЧТО, не КАК.'},
+  {cat:'Vibe Coding', q:'Принцип MVP в AI-разработке?', a:'<strong>Minimum Viable Product</strong> — начни с минимального работающего действия. "Hello World" пост → скилл → стиль → автоматизация.'},
+  {cat:'Vibe Coding', q:'Как AI исправляет ошибки?', a:'Скопируй текст ошибки → вставь в промпт. AI найдёт причину и исправит. <strong>Не пытайся починить сам</strong> — дай AI полный контекст.'},
+  {cat:'Vibe Coding', q:'5-фазный контент-пайплайн?', a:'<strong>1.</strong> Questions (context engineering)<br><strong>2.</strong> Research (Exa)<br><strong>3.</strong> Draft (со стилем)<br><strong>4.</strong> Deaify (4 критика)<br><strong>5.</strong> Deploy (git + queue)'},
+  {cat:'Vibe Coding', q:'4 критика в Deaify?', a:'<strong>1.</strong> Ритм и читаемость<br><strong>2.</strong> AI-штампы (~100 фраз)<br><strong>3.</strong> Специфичность (числа вместо "много")<br><strong>4.</strong> Фактчекинг (даты, логика)'},
+];
+
+let activeCardFilter = 'all';
+
+function renderCards() {
+  const grid = document.getElementById('cardsGrid');
+  const filterEl = document.getElementById('cardsFilter');
+  const counterEl = document.getElementById('cardsCounter');
+
+  // Build filter buttons
+  const cats = ['all', ...new Set(CARDS.map(c => c.cat))];
+  filterEl.innerHTML = cats.map(c =>
+    `<div class="cards-filter-btn${activeCardFilter === c ? ' active' : ''}" onclick="filterCards('${c}')">${c === 'all' ? 'All' : c}</div>`
+  ).join('');
+
+  // Filter cards
+  const filtered = activeCardFilter === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCardFilter);
+  counterEl.textContent = `${filtered.length} of ${CARDS.length} cards`;
+
+  // Render
+  grid.innerHTML = filtered.map((c, i) =>
+    `<div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-inner">
+        <div class="flashcard-face flashcard-front">
+          <div class="flashcard-cat">${c.cat}</div>
+          <div class="flashcard-q">${c.q}</div>
+          <div class="flashcard-hint">click to flip</div>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <div class="flashcard-cat">${c.cat}</div>
+          <div class="flashcard-a">${c.a}</div>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function filterCards(cat) {
+  activeCardFilter = cat;
+  renderCards();
+}
+
+// ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1878,6 +2046,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSkills();
   renderVaultTree();
   renderRoles();
+  renderCards();
   updateProgress();
 
   // Show onboarding hint after terminal is ready
