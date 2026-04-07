@@ -299,7 +299,6 @@ const FS = {
 | Dan    | Tech Lead               |
 | Katya  | Content & Marketing     |
 | Olya   | Community Manager       |
-| Elena  | Business Assistant      |
 | Karina | Program Coordinator     |
 
 ## MCP Telegram — Rules
@@ -334,7 +333,7 @@ const FS = {
   '~/ai-mindset-2026/meetings/': {type:'dir', children:['one-on-one/','weekly-syncs/','{meeting} AIM Marketing Weekly Sync – 2026-01-08.md','{transcript} {krisp} AI mindset weekly – 2026-03-28.md','...64 more files']},
   '~/ai-mindset-2026/Labs/': {type:'dir', children:['s1 – POS sprint/','s2 – ai-native sprint/','s3 – self-dev sprint/','w26/','x26 – spring lab/','auto02/','Pitch Lab/','demodays/','_passed labs/']},
   '~/ai-mindset-2026/Org/': {type:'dir', children:['HR/','Partners/','Processes/','Marketing&Sales/','infrastructure/','Curators/','offers/']},
-  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Irina Porokhovnikova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Elena Lesnikova.md','{role} Karina Vantslav.md','archive/']},
+  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Irina Porokhovnikova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Karina Vantslav.md','archive/']},
   '~/ai-mindset-2026/Products Ecosystem/': {type:'dir', children:['Space/','Circle/','B2B/','Borodich Ventures/','Gershuni Partnership/','infrastructure МС/']},
 };
 
@@ -441,7 +440,7 @@ content calendar draft, partnership call.
   Katya  \x1b[33m◐\x1b[0m  2 IP tasks — Content calendar, carousel
   Olya   \x1b[32m●\x1b[0m  3 IP tasks — POS ops, sprint monitor
   Vlada  \x1b[32m●\x1b[0m  2 IP tasks — CloudRu, Borodich
-  Karina \x1b[32m●\x1b[0m  3 IP tasks — Lab coordination, schedule
+  Karina \x1b[32m●\x1b[0m  3 IP — Lab coordination, schedule
 
 \x1b[33mBlocked:\x1b[0m 0
 \x1b[33mOverdue:\x1b[0m 1 (Content calendar — Katya, due yesterday)
@@ -770,172 +769,442 @@ Manual steps after: cover image, featured guests, co-hosts`},
 // ============================================================
 const LESSONS = [
   {mod:'00 Setup', num:'01', title:'Установка Claude Code', desc:'npm install, авторизация, первый запуск', time:'10 мин', badge:'practice',
-   tutorial:`Добро пожаловать в Claude Code Lab!
+   tutorial:`\x1b[1mЧто такое Claude Code?\x1b[0m
+Агент в терминале. Не чат-бот — он читает файлы, пишет код,
+вызывает инструменты. Работает в ТВОЕЙ рабочей папке.
 
-Начнём с установки. Попробуй эти команды:
+\x1b[33m1. Установка (требуется Node.js 18+):\x1b[0m
 
   \x1b[36m$ npm install -g @anthropic-ai/claude-code\x1b[0m
-  \x1b[36m$ claude --version\x1b[0m
-  \x1b[36m$ claude login\x1b[0m
+  \x1b[36m$ claude --version\x1b[0m   → должно показать 1.0.34+
 
-После установки запусти Claude Code в рабочей папке:
+\x1b[33m2. Авторизация:\x1b[0m
+
+  \x1b[36m$ claude login\x1b[0m
+  → откроется браузер → выбери Claude Pro/Max ($20/мес)
+  → или Console API (pay-as-you-go)
+
+\x1b[33m3. Первый запуск:\x1b[0m
 
   \x1b[36m$ cd ~/ai-mindset-2026\x1b[0m
   \x1b[36m$ claude\x1b[0m
+  → агент получит доступ ко всем файлам в папке
 
-Агент получит доступ ко всем файлам. Попробуй!`},
+\x1b[33m4. Переключение модели:\x1b[0m
+  \x1b[36m/model opus\x1b[0m   — максимальное качество (дорого)
+  \x1b[36m/model sonnet\x1b[0m — баланс цена/качество (рекомендуется)
+  \x1b[36m/model haiku\x1b[0m  — быстро и дёшево
+
+\x1b[1mФилософия Vibe Coding:\x1b[0m говори агенту ЧТО сделать, не КАК.
+"Найди все встречи за март" лучше чем "grep -r meeting meetings/"
+
+Попробуй: \x1b[36mclaude\x1b[0m, \x1b[36mclaude --version\x1b[0m, \x1b[36mclaude login\x1b[0m`},
+
   {mod:'00 Setup', num:'02', title:'Терминал для нетехнических', desc:'pwd, ls, cd — минимум для работы', time:'10 мин', badge:'theory',
-   tutorial:`Терминал — текстовый интерфейс. Минимум команд:
+   tutorial:`\x1b[1mТерминал — текстовый интерфейс для управления компьютером.\x1b[0m
+Не бойся — нужно знать всего 7 команд.
 
-  \x1b[36mpwd\x1b[0m        — где я сейчас
-  \x1b[36mls\x1b[0m         — что в папке
-  \x1b[36mls папка/\x1b[0m  — что внутри папки
-  \x1b[36mcd папка\x1b[0m   — перейти в папку
-  \x1b[36mcd ..\x1b[0m      — вернуться назад
-  \x1b[36mcat файл\x1b[0m   — прочитать файл
-  \x1b[36mtree\x1b[0m       — дерево папок
+\x1b[33mНавигация:\x1b[0m
+  \x1b[36mpwd\x1b[0m              где я сейчас (print working directory)
+  \x1b[36mls\x1b[0m               что в текущей папке
+  \x1b[36mls папка/\x1b[0m        что внутри другой папки
+  \x1b[36mcd папка\x1b[0m         перейти в папку
+  \x1b[36mcd ..\x1b[0m            вернуться назад на уровень вверх
+  \x1b[36mcd ~\x1b[0m             домой (корень vault)
 
-Попробуй: \x1b[36mls\x1b[0m, затем \x1b[36mls .claude/skills/\x1b[0m`},
-  {mod:'01 Fundamentals', num:'03', title:'Первый диалог с агентом', desc:'Промпты, файловые операции, поиск', time:'15 мин', badge:'practice',
-   tutorial:`Claude Code — агент, не чат-бот. Он выполняет действия.
+\x1b[33mЧтение файлов:\x1b[0m
+  \x1b[36mcat файл\x1b[0m         прочитать содержимое
+  \x1b[36mtree\x1b[0m             дерево папок (визуально)
 
-В этом терминале ты можешь симулировать работу:
+\x1b[33mПоиск:\x1b[0m
+  \x1b[36mgrep текст\x1b[0m       найти текст в файлах
+  \x1b[36mfind имя\x1b[0m         найти файл по имени
 
-  \x1b[36mls ai-mindset-2026/\x1b[0m  — структура team vault
-  \x1b[36mls .claude/skills/\x1b[0m   — все скиллы
-  \x1b[36mcat CLAUDE.md\x1b[0m        — конституция агента
+\x1b[33mТрюки:\x1b[0m
+  \x1b[36mTab\x1b[0m              автодополнение (нажми Tab!)
+  \x1b[36m↑ / ↓\x1b[0m           история команд
+  \x1b[36mCtrl+L\x1b[0m          очистить экран
 
-Ключевое: говори агенту ЧТО, не КАК.
-"Найди встречи за март" > "grep -r meeting meetings/"`},
-  {mod:'01 Fundamentals', num:'04', title:'Работа с файлами', desc:'Naming convention, создание и поиск', time:'15 мин', badge:'practice',
-   tutorial:`Naming convention AI Mindset:
+\x1b[33mУпражнение:\x1b[0m
+  1. \x1b[36mls\x1b[0m                       — что в корне?
+  2. \x1b[36mls .claude/skills/\x1b[0m       — 44 скилла
+  3. \x1b[36mcd ai-mindset-2026\x1b[0m       — зайди в vault
+  4. \x1b[36mls\x1b[0m                       — что внутри?
+  5. \x1b[36mcd ..\x1b[0m                    — вернись назад`},
 
+  {mod:'01 Fundamentals', num:'03', title:'Vibe Coding — философия', desc:'Работа через коммуникацию с AI, не через код', time:'15 мин', badge:'theory',
+   tutorial:`\x1b[1mVibe Coding — разработка через коммуникацию с AI.\x1b[0m
+Термин Андрея Карпати. Суть: ты описываешь ЧТО нужно,
+AI пишет КАК это сделать.
+
+\x1b[33mПринципы:\x1b[0m
+
+  \x1b[32m1. MVP\x1b[0m — начни с минимального работающего действия.
+     Не планируй систему — сделай один пост, один файл.
+
+  \x1b[32m2. Iterate\x1b[0m — попробуй → посмотри → поправь → повтори.
+     AI исправляет свои ошибки, если дать ему контекст.
+
+  \x1b[32m3. Error = context\x1b[0m — ошибка? Скопируй текст ошибки
+     и вставь в промпт. AI найдёт причину.
+
+  \x1b[32m4. Don't fall in love with tools\x1b[0m — принципы важнее
+     конкретных инструментов. Claude Code сегодня, завтра другое.
+
+  \x1b[32m5. Human in the loop forever\x1b[0m — AI выполняет,
+     человек проверяет и направляет.
+
+\x1b[33mЧто делать, когда AI ошибается:\x1b[0m
+  1. Скопируй текст ошибки целиком
+  2. Вставь в новый промпт: "Получил эту ошибку: ..."
+  3. Добавь контекст: что пытался сделать
+  4. AI починит в 90% случаев
+
+Claude Code — это агент, не чат-бот. Он выполняет действия:
+читает файлы, пишет код, ищет в интернете, отправляет сообщения.
+
+Попробуй: \x1b[36mls ai-mindset-2026/\x1b[0m — структура того, с чем работает агент`},
+
+  {mod:'01 Fundamentals', num:'04', title:'Работа с файлами', desc:'Naming convention, vault структура', time:'15 мин', badge:'practice',
+   tutorial:`\x1b[1mВсё в AI Mindset — файлы в Obsidian vault.\x1b[0m
+11,865 документов. Naming convention — критически важна.
+
+\x1b[33mФормат имени файла:\x1b[0m
   \x1b[36m{project} {type} description – YYYY-MM-DD.md\x1b[0m
 
-Примеры:
+\x1b[33mPrimary types:\x1b[0m
+  {rule}      — правило, стандарт
+  {prd}       — спецификация продукта
+  {research}  — исследование
+  {meeting}   — встреча
+  {transcript}— транскрипт
+  {process}   — процесс / процедура
+  {partner}   — партнёр
+  {role}      — роль сотрудника
+
+\x1b[33mПримеры:\x1b[0m
   {AIM} {research} Competitor Analysis – 2026-03-30.md
-  {AIM} {meeting} Weekly Sync – 2026-03-28.md
   {rule} Claude Context Management Protocol.md
+  {AIM} {meeting} Weekly Sync – 2026-03-28.md
 
-Дата ВСЕГДА в конце. Не добавляй инструмент в имя.
+\x1b[31mКритические правила:\x1b[0m
+  • Дата ВСЕГДА в конце (не в середине!)
+  • НЕ добавлять инструмент (Claude Code, Cursor) в имя
+  • НЕ создавать новые папки (только существующие)
+  • {AIM} файлы → team vault, остальные → personal
 
-Попробуй: \x1b[36mls ai-mindset-2026/inbox/\x1b[0m`},
-  {mod:'01 Fundamentals', num:'05', title:'CLAUDE.md — конституция', desc:'Project memory, auto memory, правила', time:'15 мин', badge:'theory',
-   tutorial:`CLAUDE.md — файл правил, который агент читает при запуске.
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36mls ai-mindset-2026/inbox/\x1b[0m   — research файлы
+  \x1b[36mls ai-mindset-2026/meetings/\x1b[0m — встречи
+  \x1b[36mfind rule\x1b[0m                    — все правила`},
 
-  \x1b[36mcat CLAUDE.md\x1b[0m  — посмотри содержимое
+  {mod:'01 Fundamentals', num:'05', title:'CLAUDE.md — конституция агента', desc:'Project memory, auto memory, правила', time:'15 мин', badge:'theory',
+   tutorial:`\x1b[1mCLAUDE.md — файл, который агент читает при каждом запуске.\x1b[0m
+Это его "конституция": что можно, что нельзя, как работать.
 
-Что включить:
-  • Naming convention
-  • Структура папок
-  • Роли команды
-  • Стиль коммуникации
-  • Запреты (каналы Telegram, etc.)
+\x1b[33mЧто включить в CLAUDE.md:\x1b[0m
+  1. \x1b[36mNaming convention\x1b[0m — формат имён файлов
+  2. \x1b[36mFolder rules\x1b[0m     — куда класть какие файлы
+  3. \x1b[36mTeam roles\x1b[0m       — кто за что отвечает
+  4. \x1b[36mCommunication\x1b[0m    — стиль сообщений
+  5. \x1b[36mProhibitions\x1b[0m     — запрещённые каналы/действия
+  6. \x1b[36mContext protocol\x1b[0m — как управлять контекстом
 
-Помимо CLAUDE.md агент ведёт auto memory:
-  \x1b[36mls .claude/memory/\x1b[0m`},
-  {mod:'02 Skills & MCP', num:'06', title:'Создание скилла', desc:'Markdown skill files, три уровня', time:'20 мин', badge:'practice',
-   tutorial:`Скилл = markdown-файл с инструкциями. Вызов: /имя
+\x1b[33mAuto Memory:\x1b[0m
+  Помимо CLAUDE.md агент ведёт собственную память:
+  \x1b[36m~/.claude/memory/\x1b[0m — записи между сессиями
+  Сохраняет: решения, паттерны, фидбек пользователя
 
-Три уровня:
-  \x1b[36mGlobal\x1b[0m  ~/.claude/skills/     — все проекты
-  \x1b[36mTeam\x1b[0m    aim-rules/skills/     — команда AIM
-  \x1b[36mLocal\x1b[0m   .claude/skills/        — этот проект
+\x1b[33mEvals (самооценка):\x1b[0m
+  Каждый ответ оценивается по 3 областям:
+  T (Text) — ясность, структура
+  R (Rules) — naming, форматирование
+  C (Code) — работает, минимализм
+  \x1b[36meval: T:✓ R:✓ C:○\x1b[0m — в footer каждого ответа
 
-Попробуй запустить скиллы:
-  \x1b[36m/pos-audit\x1b[0m
-  \x1b[36m/daily-focus\x1b[0m
-  \x1b[36m/AIM-pm\x1b[0m
-  \x1b[36m/help\x1b[0m  — полный список`},
-  {mod:'02 Skills & MCP', num:'07', title:'MCP серверы', desc:'Linear, Telegram, Exa, Notion, Sheets', time:'20 мин', badge:'theory',
-   tutorial:`MCP (Model Context Protocol) — подключение внешних систем.
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36mcat CLAUDE.md\x1b[0m          — прочитай конституцию
+  \x1b[36mls .claude/\x1b[0m            — структура конфига
+  \x1b[36mls .claude/memory/\x1b[0m     — auto-memory записи`},
 
-  \x1b[36mcat .claude/mcp.json\x1b[0m  — конфигурация
+  {mod:'02 Skills & MCP', num:'06', title:'Skills — создание и использование', desc:'Markdown skills, три уровня, Superpowers', time:'20 мин', badge:'practice',
+   tutorial:`\x1b[1mСкилл = markdown-файл с инструкциями для AI агента.\x1b[0m
+Вызов: \x1b[36m/имя-скилла\x1b[0m — агент подгружает инструкции.
 
-7 серверов команды AIM:
-  linear     — задачи, проекты
-  telegram   — сообщения, чаты
-  exa        — семантический поиск
-  notion     — страницы, базы
-  sheets     — Google Sheets
-  krisp      — встречи, транскрипты
-  playwright — браузерная автоматизация
+\x1b[33mСтруктура скилла:\x1b[0m
+  ---
+  name: my-skill
+  description: Что делает и КОГДА использовать
+  ---
+  # Инструкции
+  Шаги, правила, шаблоны...
 
-API ключи в mcp.json — НЕ в git!`},
-  {mod:'03 Team Workflows', num:'08', title:'Morning Brief & VOX', desc:'Утренний ритуал с агентом', time:'15 мин', badge:'practice',
-   tutorial:`Утренний контекст дня:
+\x1b[33mТри уровня скиллов:\x1b[0m
+  \x1b[36mGlobal\x1b[0m  ~/.claude/skills/       все проекты, личные
+  \x1b[36mTeam\x1b[0m    aim-rules/skills/       команда AIM (17 скиллов)
+  \x1b[36mLocal\x1b[0m   .claude/skills/          конкретный проект
 
-  \x1b[36m/pos-morning\x1b[0m   — calendar + Linear + sessions
-  \x1b[36m/daily-focus\x1b[0m   — одна фраза + Telegram
-  \x1b[36m/vox\x1b[0m           — полный plan с приоритетами
-  \x1b[36m/calendar\x1b[0m      — Google Calendar events
+\x1b[33mDescription — ключ к работе:\x1b[0m
+  Паттерн WHEN / WHEN NOT:
+  "Use WHEN user asks about partners. Do NOT use for internal team tasks."
+  AI загружает только нужные скиллы (progressive disclosure).
 
-Попробуй каждый — они показывают реальные данные.`},
-  {mod:'03 Team Workflows', num:'09', title:'Linear Integration', desc:'Tasks, updates, ambient layer', time:'15 мин', badge:'practice',
-   tutorial:`Linear Awareness Layer — фоновое отслеживание задач.
+\x1b[33mSuperpowers (github.com/obra/superpowers):\x1b[0m
+  30+ готовых скиллов: brainstorming, TDD, systematic-debugging,
+  de-AI-ify, code-review и другие.
+  Установка: git clone в ~/.claude/skills/superpowers
 
-  \x1b[36m/linear-action\x1b[0m — синтаксис действий
+\x1b[33mУпражнение — попробуй скиллы:\x1b[0m
+  \x1b[36m/pos-audit\x1b[0m        — аудит инфраструктуры
+  \x1b[36m/AIM-pm\x1b[0m           — dashboard команды
+  \x1b[36m/daily-focus\x1b[0m      — фокус дня
+  \x1b[36m/content-voice\x1b[0m    — проверка текста
+  \x1b[36mls .claude/skills/\x1b[0m — все 44 скилла
+  \x1b[36mls ai-mindset-2026/aim-rules/skills/\x1b[0m — 17 командных`},
 
-В footer каждого ответа:
+  {mod:'02 Skills & MCP', num:'07', title:'MCP — подключение внешних систем', desc:'Linear, Telegram, Exa, Notion + конфигурация', time:'20 мин', badge:'theory',
+   tutorial:`\x1b[1mMCP (Model Context Protocol) — стандарт подключения внешних\x1b[0m
+\x1b[1mинструментов к AI агентам.\x1b[0m Конфигурация: ~/.claude/mcp.json
+
+\x1b[33m7 MCP серверов команды AIM:\x1b[0m
+  \x1b[36mlinear\x1b[0m      задачи, проекты, спринты
+  \x1b[36mtelegram\x1b[0m    сообщения, чаты, боты
+  \x1b[36mexa\x1b[0m         семантический поиск в интернете
+  \x1b[36mnotion\x1b[0m      страницы, базы данных
+  \x1b[36msheets\x1b[0m      Google Sheets (данные, отчёты)
+  \x1b[36mkrisp\x1b[0m       транскрипты встреч
+  \x1b[36mplaywright\x1b[0m  браузерная автоматизация
+
+\x1b[33mExa — семантический поиск:\x1b[0m
+  В отличие от Google, Exa понимает СМЫСЛ запроса.
+  Бесплатно: 1000 кредитов. Всегда добавляй дату в запрос.
+  Супер-промпт: "Исследуй лучшие практики для [тема],
+  используя exa mcp. Сегодня [дата]."
+
+\x1b[33mКонфигурация (mcp.json):\x1b[0m
+  {
+    "mcpServers": {
+      "exa": {
+        "command": "npx",
+        "args": ["@modelcontextprotocol/server-exa"],
+        "env": { "EXA_API_KEY": "exa_..." }
+      }
+    }
+  }
+
+\x1b[31mВажно:\x1b[0m API ключи в mcp.json — НЕ коммитить в git!
+
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36mcat .claude/mcp.json\x1b[0m — посмотри конфигурацию
+  \x1b[36m/research\x1b[0m            — увидишь Exa в действии`},
+
+  {mod:'03 Team Workflows', num:'08', title:'Утренний ритуал', desc:'Morning brief, VOX, daily focus — 3 инструмента контекста', time:'15 мин', badge:'practice',
+   tutorial:`\x1b[1mТри утренних скилла дают полный контекст дня.\x1b[0m
+Это паттерн "3 daily rituals" из POS Sprint.
+
+\x1b[33m/pos-morning — быстрый brief (2 мин):\x1b[0m
+  Собирает: Google Calendar + Linear задачи +
+  последние сессии Claude Code + фокус из vault.
+  Результат: одна фраза дня + список дел.
+
+\x1b[33m/vox — полный advisor (5 мин):\x1b[0m
+  Анализирует ВСЁ: calendar, Linear, krisp (встречи),
+  vault, фокус. Выдаёт: 3 приоритета + "НЕ делать сегодня".
+  Использует: MCP linear + calendar + krisp.
+
+\x1b[33m/daily-focus — фокус → Telegram:\x1b[0m
+  Генерирует #focus сообщение + визуальную метафору.
+  Отправляет в Saved Messages (для себя).
+
+\x1b[33mКогда что использовать:\x1b[0m
+  08:30  \x1b[36m/pos-morning\x1b[0m — проснулся, контекст
+  09:00  \x1b[36m/vox\x1b[0m         — планируешь день
+  19:00  \x1b[36m/daily-focus\x1b[0m — итоги + завтрашний фокус
+
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36m/pos-morning\x1b[0m  — попробуй morning brief
+  \x1b[36m/vox\x1b[0m          — попробуй day advisor
+  \x1b[36m/calendar\x1b[0m     — расписание дня`},
+
+  {mod:'03 Team Workflows', num:'09', title:'Linear — задачи команды', desc:'Ambient layer, actions, team dashboard', time:'15 мин', badge:'practice',
+   tutorial:`\x1b[1mLinear Awareness Layer — фоновое отслеживание задач.\x1b[0m
+Работает автоматически, без явного вызова.
+
+\x1b[33mКак это работает:\x1b[0m
+  1. При старте сессии — кэш задач из Linear MCP
+  2. Сопоставление темы сессии с задачами
+  3. В footer каждого ответа: статус задачи
+
+\x1b[33mFooter пример:\x1b[0m
   ▫ linear: AIM-2054 · BOS speakers · ◐ IP
 
-Символы: ○ Todo · ◐ In Progress · ◑ Review · ● Done
+\x1b[33mСимволы статусов:\x1b[0m
+  ○  Todo        (не начата)
+  ◐  In Progress (в работе)
+  ◑  In Review   (на проверке)
+  ●  Done        (готова)
 
-Попробуй: \x1b[36m/AIM-pm\x1b[0m — dashboard команды`},
-  {mod:'03 Team Workflows', num:'10', title:'Telegram & Communication', desc:'Стиль AIM, отправка сообщений', time:'15 мин', badge:'theory',
-   tutorial:`Стиль AI Mindset Project Communication:
+\x1b[33m/linear-action — действия с задачами:\x1b[0m
+  /linear-action AIM-2054 update  — добавить комментарий
+  /linear-action AIM-2054 close   — закрыть задачу
+  /linear-action create           — создать новую
 
-  • строчная буква в начале
-  • без эмоджи
-  • EN DASH (–) вместо тире
-  • конкретно: кто, что, когда, ссылка
-  • без корпоративщины
+\x1b[33m/AIM-pm — team dashboard:\x1b[0m
+  Показывает все задачи команды: кто, что, статус, блокеры.
 
-Запрещено: канал AI Mindset (ID: 1877517944)
-При сомнении → Saved Messages
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36m/linear-action\x1b[0m — синтаксис действий
+  \x1b[36m/AIM-pm\x1b[0m        — dashboard всей команды`},
 
-  \x1b[36m/content-voice\x1b[0m — проверка текста`},
-  {mod:'04 Advanced', num:'11', title:'Субагенты', desc:'Параллельная работа, delegation', time:'15 мин', badge:'advanced',
-   tutorial:`Субагенты — параллельные процессы.
+  {mod:'03 Team Workflows', num:'10', title:'Коммуникация и стиль', desc:'AIM стиль, Telegram, content voice, deaify', time:'15 мин', badge:'theory',
+   tutorial:`\x1b[1mСтиль AI Mindset — анти-корпоратив.\x1b[0m
+Конкретность > вежливость. Действие > обсуждение.
 
-  \x1b[36m/research\x1b[0m      — 3 Exa sub-agents
-  \x1b[36m/ceo-council\x1b[0m   — 4 expert perspectives
+\x1b[33m6 правил AIM стиля:\x1b[0m
+  1. строчная буква в начале блоков
+  2. без эмоджи (исключение: если просят)
+  3. EN DASH (–) вместо тире
+  4. конкретно: кто, что, когда, ссылка
+  5. без корпоративщины ("в рамках", "хотелось бы")
+  6. без ложной вежливости ("извините за беспокойство")
 
-Когда использовать:
+\x1b[33mDe-AI-ification — убрать AI-шность:\x1b[0m
+  6 признаков AI slop:
+  • Общие фразы ("в современном мире")
+  • Избыточная формальность
+  • Списки через запятую
+  • Предсказуемая структура
+  • Отсутствие специфики
+  • Излишний оптимизм
+
+\x1b[33m4 критика (из оригинального курса Серёжи Риса):\x1b[0m
+  Critic 1: Ритм и читаемость
+  Critic 2: AI-штампы (~100 фраз)
+  Critic 3: Специфичность (числа вместо "много")
+  Critic 4: Фактчекинг
+
+\x1b[31mЗапрещено:\x1b[0m канал AI Mindset (ID: 1877517944)
+При сомнении → отправляй в Saved Messages
+
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36m/content-voice\x1b[0m — проверь текст на AI-шность`},
+
+  {mod:'04 Advanced', num:'11', title:'Субагенты и параллельная работа', desc:'Exa research, CEO Council, MapReduce', time:'15 мин', badge:'advanced',
+   tutorial:`\x1b[1mСубагенты — параллельные процессы для ускорения.\x1b[0m
+Один промпт → несколько AI работают одновременно.
+
+\x1b[33mКогда использовать:\x1b[0m
   ✓ Задачи независимы (разные источники)
   ✓ Можно синтезировать результаты
+  ✓ Нужна скорость (3-4x ускорение)
   ✗ Задачи зависят друг от друга
 
-Попробуй: \x1b[36m/research\x1b[0m и \x1b[36m/ceo-council\x1b[0m`},
-  {mod:'04 Advanced', num:'12', title:'Hooks & Automations', desc:'SessionStart, PreToolUse, cron', time:'15 мин', badge:'advanced',
-   tutorial:`Hooks — автоматические реакции на события.
+\x1b[33mПримеры в действии:\x1b[0m
 
-  SessionStart  — при запуске (linear cache, cleanup)
-  PreToolUse    — перед инструментом (валидация)
-  PostToolUse   — после (логирование)
-  Stop          — при завершении (save state)
+  \x1b[36m/research\x1b[0m — 3 Exa sub-agents параллельно:
+    Agent 1: market landscape
+    Agent 2: competitor analysis
+    Agent 3: trend detection
+    Итого: 25 источников за 15 секунд
 
-Ambient layers строятся на hooks:
-  • Linear Awareness — кэш задач при старте
-  • Telegram cleanup — очистка temp файлов
-  • Shepherd — progress tracking`},
-  {mod:'04 Advanced', num:'13', title:'Personal Operating System', desc:'Собираем POS из компонентов', time:'20 мин', badge:'advanced',
-   tutorial:`POS — конечная цель: персональная операционная система.
+  \x1b[36m/ceo-council\x1b[0m — 4 expert perspectives:
+    Growth Strategist + Product Architect +
+    Financial Advisor + Risk Analyst
+    Каждый анализирует независимо → синтез
 
-  \x1b[36m/pos-audit\x1b[0m     — текущий score (0-12)
-  \x1b[36m/pos-setup\x1b[0m     — 6-phase pipeline с нуля
+\x1b[33mTask API — продвинутый паттерн:\x1b[0m
+  Для масштабных задач (10+ параллельных агентов):
+  MapReduce: разбить на части → параллельно → собрать
+  Пример: исследование 10 конкурентов за 3 минуты.
 
-Компоненты:
-  1. CLAUDE.md     — правила
-  2. Skills        — 3-5 частых операций
-  3. MCP           — Linear + Telegram
-  4. Memory        — ключевые решения
-  5. Hooks         — автоматизация рутины
-  6. Iterate       — добавлять по мере работы
+\x1b[33mМодели для субагентов:\x1b[0m
+  Opus   — для синтеза и сложных решений
+  Sonnet — для параллельных рабочих задач
+  Haiku  — для простых проверок и валидации
 
-Философия: начни с малого, расти по потребности.
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36m/research\x1b[0m    — 3 Exa агента в действии
+  \x1b[36m/ceo-council\x1b[0m — 4 эксперта параллельно`},
 
-Запусти \x1b[36m/pos-audit\x1b[0m чтобы увидеть полную картину.`}
+  {mod:'04 Advanced', num:'12', title:'Hooks и автоматизация', desc:'SessionStart, PreToolUse, cron, ambient layers', time:'15 мин', badge:'advanced',
+   tutorial:`\x1b[1mHooks — автоматические действия при событиях.\x1b[0m
+Настраиваются в settings.json. Работает "движок" Claude Code.
+
+\x1b[33m4 типа hooks:\x1b[0m
+  \x1b[36mSessionStart\x1b[0m   при запуске Claude Code
+    → кэш Linear задач, cleanup temp файлов
+  \x1b[36mPreToolUse\x1b[0m     перед вызовом инструмента
+    → валидация, проверка permissions
+  \x1b[36mPostToolUse\x1b[0m    после вызова инструмента
+    → логирование, уведомления
+  \x1b[36mStop\x1b[0m           при завершении сессии
+    → save state, commit progress
+
+\x1b[33mAmbient layers (построены на hooks):\x1b[0m
+  Linear Awareness — автоматический match задач
+  Telegram cleanup — очистка temp файлов при старте
+  Shepherd — daily progress tracking в menu bar
+
+\x1b[33mCron автоматизация:\x1b[0m
+  Скилл /schedule создаёт recurring tasks:
+  "Каждое утро в 08:30 запусти /pos-morning"
+  "В пятницу вечером — weekly summary"
+
+\x1b[33mQueue system (из курса Серёжи Риса):\x1b[0m
+  queue.json → scheduler.py → cron → публикация
+  Паттерн: накопить контент → одобрить → автопубликация
+
+\x1b[33mСовет:\x1b[0m не автоматизируй всё сразу.
+Сначала сделай вручную 10 раз → пойми паттерн → автоматизируй.`},
+
+  {mod:'04 Advanced', num:'13', title:'Personal Operating System', desc:'POS — собираем систему из 6 компонентов', time:'20 мин', badge:'advanced',
+   tutorial:`\x1b[1mPOS — Personal Operating System. Конечная цель курса.\x1b[0m
+Персональная операционная система для работы с AI.
+
+\x1b[33m6 компонентов (в порядке приоритета):\x1b[0m
+
+  \x1b[36m1. CLAUDE.md\x1b[0m     — правила и контекст
+     Начни с 10 строк. Расти по мере работы.
+
+  \x1b[36m2. Skills\x1b[0m        — 3-5 частых операций
+     /pos-morning, /daily-focus, /AIM-pm
+     Не создавай больше 5 — лучше меньше, но качественно.
+
+  \x1b[36m3. MCP\x1b[0m           — Linear + Telegram
+     Начни с 2 серверов. Добавляй по потребности.
+
+  \x1b[36m4. Memory\x1b[0m        — ключевые решения
+     Auto-memory сохраняет feedback автоматически.
+
+  \x1b[36m5. Hooks\x1b[0m         — автоматизация рутины
+     SessionStart: linear-cache, cleanup
+     Добавлять ТОЛЬКО когда паттерн повторяется 10+ раз.
+
+  \x1b[36m6. Iterate\x1b[0m       — добавлять по мере работы
+     POS не строится за день. Это итеративный процесс.
+
+\x1b[33mPOS Score (0-12):\x1b[0m
+  Каждый компонент оценивается. /pos-audit показывает текущий score.
+  Score 6 — хороший старт. Score 10+ — продвинутый.
+
+\x1b[33mФилософия:\x1b[0m
+  "Начни с малого, расти по потребности."
+  Не настраивай всё сразу. Одна неделя — один компонент.
+  Week 1: CLAUDE.md
+  Week 2: 3 скилла
+  Week 3: Linear MCP
+  Week 4: первый hook
+
+\x1b[33m5-фазный контент-пайплайн (бонус):\x1b[0m
+  Phase 1: Questions (context engineering)
+  Phase 2: Research (Exa sub-agents)
+  Phase 3: Draft (с style guide)
+  Phase 4: Deaify (4 критика параллельно)
+  Phase 5: Deploy (git + queue + publish)
+
+\x1b[33mУпражнение:\x1b[0m
+  \x1b[36m/pos-audit\x1b[0m — текущий score инфраструктуры
+  \x1b[36mtree ~/.claude\x1b[0m — полная структура POS`}
 ];
 
 // ============================================================
@@ -1465,7 +1734,7 @@ Next steps:
       if (!currentRole) {
         term.writeln('\x1b[33mВыбери роль сначала:\x1b[0m кликни на роль вверху страницы или введи:');
         term.writeln('  \x1b[36mrole founder\x1b[0m | \x1b[36mrole operations\x1b[0m | \x1b[36mrole circle\x1b[0m | \x1b[36mrole tech\x1b[0m');
-        term.writeln('  \x1b[36mrole content\x1b[0m | \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m | \x1b[36mrole assistant\x1b[0m');
+        term.writeln('  \x1b[36mrole content\x1b[0m | \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m');
         prompt();
         break;
       }
@@ -1847,7 +2116,7 @@ function renderVaultTree() {
     ['    w26/', 'Winter 2026 cohort'],
     ['    x26 – spring lab/', 'Spring 2026 lab'],
     ['  Org/', 'организационная структура'],
-    ['    HR/', 'роли команды (9 человек) + archive'],
+    ['    HR/', 'роли команды (8 человек) + archive'],
     ['    Partners/', 'партнёры и CRM'],
     ['    Processes/', 'процессы и процедуры'],
     ['    Marketing&Sales/', 'маркетинг и продажи'],
@@ -1991,19 +2260,6 @@ const ROLES = {
       {cmd: '/daily-focus', text: 'Daily focus — фокус на community задачи'},
     ]
   },
-  assistant: {
-    name: 'Elena', title: 'Business Assistant', icon: '▫',
-    desc: 'Personal ops, AIM speaker comms, launch operations, admin',
-    skills: ['calendar','pos-morning','AIM-meeting-summary','linear-action','AIM-weekly-sync','daily-focus','sessions'],
-    walkthrough: [
-      {cmd: '/calendar', text: 'Calendar — расписание Alex и команды'},
-      {cmd: '/pos-morning', text: 'Morning brief — контекст дня'},
-      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — итоги звонков → action items'},
-      {cmd: '/AIM-weekly-sync', text: 'Weekly sync — генерация повестки из Linear + calendar'},
-      {cmd: '/linear-action', text: 'Linear — трекинг задач'},
-      {cmd: '/daily-focus', text: 'Daily focus — планирование дня'},
-    ]
-  }
 };
 
 let currentRole = localStorage.getItem('cclab-role') || null;
