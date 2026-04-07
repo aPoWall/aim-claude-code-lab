@@ -241,7 +241,7 @@
         <span class="term-title">claude code lab &mdash; ~/ai-mindset</span>
         <span class="term-size" id="termSize"></span>
       </div>
-      <form autocomplete="off" data-1p-ignore data-lpignore="true" style="margin:0;padding:0" onsubmit="return false">
+      <form autocomplete="new-password" data-1p-ignore data-lpignore="true" data-bwignore style="margin:0;padding:0" onsubmit="return false">
         <div class="term-body term-body-large" id="mainTerminal"></div>
       </form>
     </div>
@@ -1290,12 +1290,15 @@ function initTerminal() {
   // Prevent browser password autofill on xterm textarea
   const xtextarea = document.querySelector('.xterm-helper-textarea');
   if (xtextarea) {
-    xtextarea.setAttribute('autocomplete', 'off');
+    xtextarea.setAttribute('autocomplete', 'new-password');
+    xtextarea.setAttribute('autocorrect', 'off');
+    xtextarea.setAttribute('autocapitalize', 'off');
     xtextarea.setAttribute('data-1p-ignore', '');
     xtextarea.setAttribute('data-lpignore', 'true');
+    xtextarea.setAttribute('data-bwignore', '');
     xtextarea.setAttribute('data-form-type', 'other');
-    xtextarea.setAttribute('aria-hidden', 'true');
-    xtextarea.name = 'terminal-input';
+    xtextarea.setAttribute('spellcheck', 'false');
+    xtextarea.name = 'xterm-input-' + Date.now();
     xtextarea.id = 'xterm-textarea';
   }
 
