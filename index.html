@@ -6,6 +6,7 @@
   <title>Claude Code Lab — AI Mindset</title>
   <meta property="og:title" content="Claude Code Lab — AI Mindset">
   <meta property="og:description" content="Интерактивный курс Claude Code с живым терминалом">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23161620'/><text x='16' y='22' text-anchor='middle' font-size='18' fill='%234dc9d4'>CC</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- xterm.js -->
@@ -853,6 +854,11 @@ AI пишет КАК это сделать.
 
   \x1b[32m5. Human in the loop forever\x1b[0m — AI выполняет,
      человек проверяет и направляет.
+
+\x1b[33mDRO Framework (Claude Workshop, 100+ команд):\x1b[0m
+  \x1b[36mDelegate\x1b[0m — рутина целиком AI (тесты, docs, boilerplate)
+  \x1b[36mReview\x1b[0m   — AI предлагает, человек решает (bug fixes, refactor)
+  \x1b[36mOwn\x1b[0m      — только человек (архитектура, безопасность, бизнес)
 
 \x1b[33mЧто делать, когда AI ошибается:\x1b[0m
   1. Скопируй текст ошибки целиком
@@ -2387,6 +2393,16 @@ const CARDS = [
   {cat:'Vibe Coding', q:'Как AI исправляет ошибки?', a:'Скопируй текст ошибки → вставь в промпт. AI найдёт причину и исправит. <strong>Не пытайся починить сам</strong> — дай AI полный контекст.'},
   {cat:'Vibe Coding', q:'5-фазный контент-пайплайн?', a:'<strong>1.</strong> Questions (context engineering)<br><strong>2.</strong> Research (Exa)<br><strong>3.</strong> Draft (со стилем)<br><strong>4.</strong> Deaify (4 критика)<br><strong>5.</strong> Deploy (git + queue)'},
   {cat:'Vibe Coding', q:'4 критика в Deaify?', a:'<strong>1.</strong> Ритм и читаемость<br><strong>2.</strong> AI-штампы (~100 фраз)<br><strong>3.</strong> Специфичность (числа вместо "много")<br><strong>4.</strong> Фактчекинг (даты, логика)'},
+
+  // DRO & Architecture (from Exa research + Gershuni lectures)
+  {cat:'Workflows', q:'DRO Framework — как делить задачи с AI?', a:'<strong>Delegate:</strong> рутина целиком AI (тесты, docs, boilerplate)<br><strong>Review:</strong> AI предлагает, человек решает (bugs, refactor)<br><strong>Own:</strong> только человек (архитектура, безопасность, бизнес-логика)'},
+  {cat:'POS', q:'6-слойная AI-Native архитектура Гершуни?', a:'<strong>1.</strong> Infrastructure (connectors, guardrails, routing)<br><strong>2.</strong> Data & Context (semantic/episodic/procedural memory)<br><strong>3.</strong> Agents<br><strong>4.</strong> Teams of agents<br><strong>5.</strong> Orchestration<br><strong>6.</strong> Governance (vertical layer)'},
+  {cat:'POS', q:'3 типа AI-памяти по Гершуни?', a:'<strong>Semantic:</strong> факты, знания (CLAUDE.md, memory/)<br><strong>Episodic:</strong> что произошло (session logs, git history)<br><strong>Procedural:</strong> как делать (skills, hooks, automations)'},
+  {cat:'Skills', q:'6-уровневая прогрессия обучения CC?', a:'<strong>1.</strong> CLAUDE.md (memory, context)<br><strong>2.</strong> Slash commands (explicit triggers)<br><strong>3.</strong> Skills (auto-activated)<br><strong>4.</strong> Hooks (lifecycle events)<br><strong>5.</strong> MCP servers (external tools)<br><strong>6.</strong> Subagents / Agent Teams'},
+  {cat:'Workflows', q:'Acceptance rate 40-60% — что это?', a:'Процент принятых AI-предложений. <strong>&lt;40%</strong> = инструмент не помогает. <strong>&gt;60%</strong> = недостаточно ревью. Оптимум: <strong>40-60%</strong> — AI полезен, но человек фильтрует.'},
+  {cat:'MCP', q:'Что такое NemoGuardrails?', a:'Open-source фреймворк NVIDIA для <strong>ограничений AI-агентов</strong>. Определяет, что агент может/не может делать. Используется в production AI-native организациях.'},
+  {cat:'Setup', q:'Как проверить что Claude Code работает?', a:'<code>which claude</code> → путь<br><code>claude --version</code> → версия 1.0.34+<br><code>claude login</code> → браузер авторизация<br><code>claude</code> в рабочей папке → агент запустился'},
+  {cat:'Vibe Coding', q:'Karpathy Prompt — что это?', a:'Техника Андрея Карпати: <strong>3 структурированных вопроса</strong> с экспертным комментарием для генерации концепции. Диалог → AI выдаёт детальный concept document.'},
 ];
 
 let activeCardFilter = 'all';
