@@ -139,22 +139,36 @@
     @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
     /* FLASHCARDS (ANKI) */
-    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .flashcard{perspective:800px;height:200px;cursor:pointer}
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    .flashcard{perspective:800px;height:220px;cursor:pointer}
     .flashcard-inner{position:relative;width:100%;height:100%;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d}
     .flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
-    .flashcard-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:6px;padding:20px;display:flex;flex-direction:column;justify-content:center}
-    .flashcard-front{background:linear-gradient(135deg,var(--bg-card) 0%,rgba(77,201,212,0.06) 100%);border:1px solid var(--border)}
-    .flashcard-front:hover{border-color:var(--teal-dim);box-shadow:0 0 24px rgba(77,201,212,0.08)}
-    .flashcard-back{background:linear-gradient(135deg,rgba(77,201,212,0.08) 0%,var(--bg-card) 100%);border:1px solid var(--teal-dim);transform:rotateY(180deg)}
-    .flashcard-cat{font-size:0.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--amber);margin-bottom:8px}
-    .flashcard-q{font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.4;color:var(--text)}
-    .flashcard-a{font-size:0.8rem;line-height:1.6;color:var(--text-dim)}
-    .flashcard-a code{color:var(--teal);background:rgba(77,201,212,0.1);padding:1px 5px;border-radius:2px;font-size:0.75rem}
-    .flashcard-a strong{color:var(--text);font-weight:500}
-    .flashcard-hint{font-size:0.6rem;color:var(--text-label);text-align:center;margin-top:8px;letter-spacing:1px}
+    .flashcard-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:8px;padding:24px;display:flex;flex-direction:column;justify-content:center}
+    .flashcard-front{background:var(--bg-card);border:1px solid var(--border);position:relative;overflow:hidden}
+    .flashcard-front::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--blue))}
+    .flashcard-front:hover{border-color:var(--teal-dim);box-shadow:0 4px 24px rgba(77,201,212,0.1);transform:translateY(-2px)}
+    .flashcard-front[data-cat="Setup"]::before{background:linear-gradient(90deg,var(--green),var(--teal))}
+    .flashcard-front[data-cat="Skills"]::before{background:linear-gradient(90deg,var(--blue),var(--purple))}
+    .flashcard-front[data-cat="MCP"]::before{background:linear-gradient(90deg,var(--teal),#06b6d4)}
+    .flashcard-front[data-cat="Workflows"]::before{background:linear-gradient(90deg,var(--amber),#f97316)}
+    .flashcard-front[data-cat="POS"]::before{background:linear-gradient(90deg,var(--purple),#ec4899)}
+    .flashcard-front[data-cat="Vibe Coding"]::before{background:linear-gradient(90deg,var(--red),var(--amber))}
+    .flashcard-back{background:linear-gradient(160deg,rgba(77,201,212,0.06) 0%,var(--bg-card) 40%);border:1px solid var(--teal-dim);transform:rotateY(180deg);overflow-y:auto}
+    .flashcard-cat{font-size:0.6rem;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;font-weight:600}
+    .flashcard-cat[data-cat="Setup"]{color:var(--green)}
+    .flashcard-cat[data-cat="Skills"]{color:var(--blue)}
+    .flashcard-cat[data-cat="MCP"]{color:var(--teal)}
+    .flashcard-cat[data-cat="Workflows"]{color:var(--amber)}
+    .flashcard-cat[data-cat="POS"]{color:var(--purple)}
+    .flashcard-cat[data-cat="Vibe Coding"]{color:var(--red)}
+    .flashcard-q{font-family:var(--sans);font-size:1.05rem;font-weight:600;line-height:1.4;color:var(--text)}
+    .flashcard-a{font-size:0.82rem;line-height:1.7;color:var(--text-dim)}
+    .flashcard-a code{color:var(--teal);background:rgba(77,201,212,0.12);padding:2px 6px;border-radius:3px;font-size:0.75rem}
+    .flashcard-a strong{color:var(--text);font-weight:600}
+    .flashcard-hint{font-size:0.55rem;color:var(--text-label);text-align:center;margin-top:auto;padding-top:8px;letter-spacing:1.5px;opacity:0.6}
+    .flashcard-num{position:absolute;bottom:12px;right:16px;font-size:0.55rem;color:var(--text-label);opacity:0.3;font-weight:600}
     .cards-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-    .cards-filter-btn{font-family:var(--mono);font-size:0.65rem;padding:6px 12px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);transition:all .2s;text-transform:uppercase;letter-spacing:1px}
+    .cards-filter-btn{font-family:var(--mono);font-size:0.65rem;padding:7px 14px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);transition:all .2s;text-transform:uppercase;letter-spacing:1px}
     .cards-filter-btn:hover{border-color:var(--teal-dim);color:var(--text)}
     .cards-filter-btn.active{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
     .cards-counter{font-size:0.65rem;color:var(--text-label);margin-bottom:16px}
@@ -1267,6 +1281,18 @@ function initTerminal() {
   term.open(document.getElementById('mainTerminal'));
   fitAddon.fit();
 
+  // Prevent browser password autofill on xterm textarea
+  const xtextarea = document.querySelector('.xterm-helper-textarea');
+  if (xtextarea) {
+    xtextarea.setAttribute('autocomplete', 'off');
+    xtextarea.setAttribute('data-1p-ignore', '');
+    xtextarea.setAttribute('data-lpignore', 'true');
+    xtextarea.setAttribute('data-form-type', 'other');
+    xtextarea.setAttribute('aria-hidden', 'true');
+    xtextarea.name = 'terminal-input';
+    xtextarea.id = 'xterm-textarea';
+  }
+
   const sz = document.getElementById('termSize');
   sz.textContent = `${term.cols}x${term.rows}`;
 
@@ -1278,18 +1304,20 @@ function initTerminal() {
   // Welcome
   const savedRole = currentRole ? ROLES[currentRole] : null;
   term.writeln('\x1b[36m');
-  term.writeln('  ╭──────────────────────────────────────────────╮');
-  term.writeln('  │  \x1b[1mClaude Code Lab\x1b[0m\x1b[36m — AI Mindset                │');
-  term.writeln('  │                                              │');
+  term.writeln('  ╭───────────────────────────────────────────────────╮');
+  term.writeln('  │  \x1b[1mClaude Code Lab\x1b[0m\x1b[36m — AI Mindset                     │');
+  term.writeln('  │                                                   │');
   if (savedRole) {
-    term.writeln(`  │  Role: \x1b[1m${(savedRole.name + ' — ' + savedRole.title).padEnd(37)}\x1b[0m\x1b[36m │`);
+    term.writeln(`  │  Role: \x1b[1m${(savedRole.name + ' — ' + savedRole.title).padEnd(42)}\x1b[0m\x1b[36m │`);
   } else {
-    term.writeln('  │  Select your role above, then type           │');
+    term.writeln('  │  \x1b[33m→ Выбери роль вверху страницы\x1b[0m\x1b[36m                  │');
   }
-  term.writeln(`  │  \x1b[1m\x1b[33mwalkthrough\x1b[0m\x1b[36m for guided tour                 │`);
-  term.writeln('  │  \x1b[1m\x1b[33mhelp\x1b[0m\x1b[36m for all commands                       │');
-  term.writeln('  │  \x1b[1m\x1b[33mrole\x1b[0m\x1b[36m to change role                         │');
-  term.writeln('  ╰──────────────────────────────────────────────╯');
+  term.writeln('  │                                                   │');
+  term.writeln('  │  \x1b[33mlesson 1\x1b[0m\x1b[36m     начать курс                         │');
+  term.writeln('  │  \x1b[33mwalkthrough\x1b[0m\x1b[36m  guided tour по скиллам твоей роли    │');
+  term.writeln('  │  \x1b[33mcards\x1b[0m\x1b[36m        flashcards для запоминания           │');
+  term.writeln('  │  \x1b[33mhelp\x1b[0m\x1b[36m         все 28 скиллов и команды             │');
+  term.writeln('  ╰───────────────────────────────────────────────────╯');
   term.writeln('\x1b[0m');
 
   prompt();
@@ -2426,13 +2454,14 @@ function renderCards() {
   grid.innerHTML = filtered.map((c, i) =>
     `<div class="flashcard" onclick="this.classList.toggle('flipped')">
       <div class="flashcard-inner">
-        <div class="flashcard-face flashcard-front">
-          <div class="flashcard-cat">${c.cat}</div>
+        <div class="flashcard-face flashcard-front" data-cat="${c.cat}">
+          <div class="flashcard-cat" data-cat="${c.cat}">${c.cat}</div>
           <div class="flashcard-q">${c.q}</div>
           <div class="flashcard-hint">click to flip</div>
+          <div class="flashcard-num">${i + 1}/${filtered.length}</div>
         </div>
         <div class="flashcard-face flashcard-back">
-          <div class="flashcard-cat">${c.cat}</div>
+          <div class="flashcard-cat" data-cat="${c.cat}">${c.cat}</div>
           <div class="flashcard-a">${c.a}</div>
         </div>
       </div>
