@@ -200,7 +200,7 @@
     <h1>Learn by Doing</h1>
     <p class="hero-sub">Живой терминал. Реальная структура vault. Настоящие скиллы. Вводи команды — учись на практике.</p>
     <div class="hero-stats">
-      <div><span class="stat-val">21</span>skills</div>
+      <div><span class="stat-val">28</span>skills</div>
       <div><span class="stat-val">7</span>MCP servers</div>
       <div><span class="stat-val">13</span>lessons</div>
     </div>
@@ -299,6 +299,7 @@ const FS = {
 | Dan    | Tech Lead               |
 | Katya  | Content & Marketing     |
 | Olya   | Community Manager       |
+| Elena  | Business Assistant      |
 | Karina | Program Coordinator     |
 
 ## MCP Telegram — Rules
@@ -333,7 +334,7 @@ const FS = {
   '~/ai-mindset-2026/meetings/': {type:'dir', children:['one-on-one/','weekly-syncs/','{meeting} AIM Marketing Weekly Sync – 2026-01-08.md','{transcript} {krisp} AI mindset weekly – 2026-03-28.md','...64 more files']},
   '~/ai-mindset-2026/Labs/': {type:'dir', children:['s1 – POS sprint/','s2 – ai-native sprint/','s3 – self-dev sprint/','w26/','x26 – spring lab/','auto02/','Pitch Lab/','demodays/','_passed labs/']},
   '~/ai-mindset-2026/Org/': {type:'dir', children:['HR/','Partners/','Processes/','Marketing&Sales/','infrastructure/','Curators/','offers/']},
-  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Irina Porokhovnikova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Karina Vantslav.md','archive/']},
+  '~/ai-mindset-2026/Org/HR/': {type:'dir', children:['roles/','{role} Alexander Povaliaev.md','{role} Irina Nazarova.md','{role} Irina Porokhovnikova.md','{role} Vlada Zorina.md','{role} Danik Vasilev.md','{role} Katya Levkovets.md','{role} Olya Sanochkina.md','{role} Elena Lesnikova.md','{role} Karina Vantslav.md','archive/']},
   '~/ai-mindset-2026/Products Ecosystem/': {type:'dir', children:['Space/','Circle/','B2B/','Borodich Ventures/','Gershuni Partnership/','infrastructure МС/']},
 };
 
@@ -638,6 +639,128 @@ Target: AI Mindset {space} chat
 Source: Notion MCP → member profiles
 
 \x1b[33mReview and send? (y/n)\x1b[0m`},
+
+  'AIM-content-calendar': {cat:'Team', desc:'Content Calendar — tasks, week planning, pipeline stats', demo:`\x1b[36m━━━ Content Calendar ━━━━━━━━━━━━━━━━━━\x1b[0m
+
+\x1b[1mThis week:\x1b[0m 5 pieces planned
+
+  Mon  \x1b[32m●\x1b[0m  Reel: AI-Native recap      → IG, TG   Katya
+  Tue  \x1b[33m◐\x1b[0m  Carousel: FOS highlights   → IG       Katya
+  Wed  \x1b[90m○\x1b[0m  Post: Space new members     → TG       Vlada
+  Thu  \x1b[90m○\x1b[0m  Story: Lab behind scenes    → IG       Katya
+  Fri  \x1b[90m○\x1b[0m  Digest: Weekly roundup      → Substack Alex
+
+\x1b[33mPipeline:\x1b[0m 12 ideas → 5 in progress → 3 review → 8 published
+\x1b[36mDashboard: aim-content-calendar.netlify.app\x1b[0m`},
+
+  'AIM-visual': {cat:'Content', desc:'Unified visual content system — covers, cards, OG, wraps, SVG', demo:`\x1b[36m━━━ AIM Visual ━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+5 modes:
+  1. \x1b[36mcover\x1b[0m    — Telegram 3:1 banners (1500x500)
+  2. \x1b[36mcard\x1b[0m     — info cards, quote cards
+  3. \x1b[36mog\x1b[0m       — Open Graph images (1200x630)
+  4. \x1b[36mwrap\x1b[0m     — wrap-up visuals for labs
+  5. \x1b[36msvg\x1b[0m      — animated SVG diagrams
+
+Design system: terminal chrome, IBM Plex Mono + Space Grotesk
+Colors: teal-grid (#161620, #4dc9d4), cinema-dark, blueprint
+
+\x1b[33mSelect mode and describe content:\x1b[0m`},
+
+  'AIM-deck-ainative': {cat:'Content', desc:'Presentation builder — blocks, drag-drop, AI generation', demo:`\x1b[36m━━━ Deck Builder v2 ━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Features:
+  • Block system — add, remove, reorder
+  • Drag-and-drop layout
+  • AI content generation per block
+  • Undo/redo history
+  • Layout picker (full, split, grid)
+  • Preview panel
+  • Export to HTML/PDF
+
+\x1b[33mNew deck or edit existing?\x1b[0m
+  Press \x1b[36mE\x1b[0m to enter edit mode`},
+
+  'AIM-weekly-sync': {cat:'Team', desc:'5 sync types — weekly, product, marketing, partnerships, personal', demo:`\x1b[36m━━━ Weekly Sync Generator ━━━━━━━━━━━━━\x1b[0m
+
+Sync types:
+  1. \x1b[36mweekly\x1b[0m        — Mon full team (Alex, Ira, Dan, Katya, Vlada, Olya, Karina)
+  2. \x1b[36mproduct\x1b[0m       — Fri (Alex, Dan, Karina)
+  3. \x1b[36mmarketing\x1b[0m     — Thu (Alex, Katya, Vlada)
+  4. \x1b[36mpartnerships\x1b[0m  — Wed (Alex, Vlada)
+  5. \x1b[36mpersonal\x1b[0m      — 1-1 (Alex + person)
+
+Generates: agenda from Linear + calendar + last sync notes
+Output: markdown in meetings/ + optional TG summary
+
+\x1b[33mSelect sync type:\x1b[0m`},
+
+  'AIM-process': {cat:'Team', desc:'Announce changes to team — new processes, roles, skills', demo:`\x1b[36m━━━ Process Announce ━━━━━━━━━━━━━━━━━━\x1b[0m
+
+Generates team announcement in AIM style:
+  • lowercase, no emoji, en dash
+  • what changed, why, who it affects
+  • action items if any
+
+Target: Saved Messages (review before sending)
+Tone: concrete, not corporate
+
+\x1b[33mDescribe the change to announce:\x1b[0m`},
+
+  'AIM-lab-closing': {cat:'Team', desc:'Lab closing — exit interviews, Wall of Love, final posts', demo:`\x1b[36m━━━ Lab Closing Sequence ━━━━━━━━━━━━━━\x1b[0m
+
+5-day arc:
+  D0  Demo Day — celebration
+  D1  Technical sync — archive + LMS access
+  D2  Evidence — Wall of Love collection
+  D3  Navigation — Space/Circle invitation
+  D4  Ecosystem — community onboarding
+  D5  Grand Finale — closing post
+
+Roles: Olya (initiator), Karina (coord), Alex (content), Dan (LMS)
+
+\x1b[33mWhich lab to close?\x1b[0m`},
+
+  'AIM-bio': {cat:'Content', desc:'Manage bio.aimindset.org — link tree for ads', demo:`\x1b[36m━━━ AIM Bio ━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+
+bio.aimindset.org — link redirect for Instagram/Facebook ads.
+Netlify deploy, Meta Pixel tracking.
+
+Current links:
+  1. Space — join community
+  2. Labs — current sprint
+  3. FOS — Founder OS sessions
+  4. Telegram — main channel
+
+\x1b[33mAdd, edit, or reorder links:\x1b[0m`},
+
+  'AIM-curator': {cat:'Team', desc:'Curator tracking — outreach, onboarding, dashboard', demo:`\x1b[36m━━━ Curator Management ━━━━━━━━━━━━━━━━\x1b[0m
+
+Actions:
+  [1] Outreach — find and contact curators
+  [2] Onboard — access, materials, process
+  [3] Dashboard — active curators, stats
+  [4] Commission — 30% referral tracking
+
+Active curators: 8
+Pending outreach: 3
+Referrals this month: 2
+
+\x1b[33mSelect action:\x1b[0m`},
+
+  'AIM-luma-space-session': {cat:'Team', desc:'Create FOS sessions — Luma + Calendar + TG announcement', demo:`\x1b[36m━━━ Luma Session Creator ━━━━━━━━━━━━━━\x1b[0m
+
+Creates:
+  • Luma event (lu.ma/ai_mind_set)
+  • Google Calendar entry
+  • TG announcement draft
+
+Permanent Zoom: 837 7601 1636
+Naming: FOS #XX // Topic — Speaker
+
+\x1b[33mUsage:\x1b[0m /AIM-luma-space-session create --fos 28 --speaker "Name" --topic "Topic"
+
+Manual steps after: cover image, featured guests, co-hosts`},
 
   'help': {cat:'System', desc:'List all available commands and skills', demo:''}
 };
@@ -1342,7 +1465,7 @@ Next steps:
       if (!currentRole) {
         term.writeln('\x1b[33mВыбери роль сначала:\x1b[0m кликни на роль вверху страницы или введи:');
         term.writeln('  \x1b[36mrole founder\x1b[0m | \x1b[36mrole operations\x1b[0m | \x1b[36mrole circle\x1b[0m | \x1b[36mrole tech\x1b[0m');
-        term.writeln('  \x1b[36mrole content\x1b[0m | \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m');
+        term.writeln('  \x1b[36mrole content\x1b[0m | \x1b[36mrole partnerships\x1b[0m | \x1b[36mrole pm\x1b[0m | \x1b[36mrole community\x1b[0m | \x1b[36mrole assistant\x1b[0m');
         prompt();
         break;
       }
@@ -1724,7 +1847,7 @@ function renderVaultTree() {
     ['    w26/', 'Winter 2026 cohort'],
     ['    x26 – spring lab/', 'Spring 2026 lab'],
     ['  Org/', 'организационная структура'],
-    ['    HR/', 'роли команды (8 человек) + archive'],
+    ['    HR/', 'роли команды (9 человек) + archive'],
     ['    Partners/', 'партнёры и CRM'],
     ['    Processes/', 'процессы и процедуры'],
     ['    Marketing&Sales/', 'маркетинг и продажи'],
@@ -1767,14 +1890,14 @@ const ROLES = {
   founder: {
     name: 'Alex', title: 'Founder & Vision Lead', icon: '◆',
     desc: 'Стратегия, educational design, partnerships, product vision',
-    skills: ['pos-morning','vox','ceo-council','AIM-pm','research','daily-focus','pos-audit'],
+    skills: ['pos-morning','vox','ceo-council','AIM-pm','AIM-deck-ainative','AIM-weekly-sync','AIM-process'],
     walkthrough: [
       {cmd: '/pos-morning', text: 'Утренний brief — calendar + Linear + sessions + vault'},
       {cmd: '/vox', text: 'Day advisor — приоритеты и план дня'},
       {cmd: '/ceo-council', text: 'Strategic analysis — 4 expert perspectives параллельно'},
       {cmd: '/AIM-pm', text: 'Team dashboard — статус каждого члена команды'},
-      {cmd: '/research', text: 'Deep research — 3 Exa sub-agents параллельно'},
-      {cmd: 'cat CLAUDE.md', text: 'Конституция агента — правила и контекст'},
+      {cmd: '/AIM-deck-ainative', text: 'Deck builder — презентации с block system и AI'},
+      {cmd: '/AIM-weekly-sync', text: 'Weekly sync — генерация повестки из Linear + calendar'},
     ]
   },
   operations: {
@@ -1806,14 +1929,14 @@ const ROLES = {
   partnerships: {
     name: 'Vlada', title: 'Partnerships & Growth Lead', icon: '◈',
     desc: 'Партнёрства, growth, Space, speaker outreach',
-    skills: ['AIM-pm','research','content-voice','calendar','AIM-meeting-summary','daily-focus','linear-action'],
+    skills: ['AIM-crm','AIM-content-voice','AIM-luma-space-session','AIM-space-new-members','AIM-content-calendar','research','calendar'],
     walkthrough: [
+      {cmd: '/AIM-crm', text: 'CRM — партнёры, pipeline, offers, подготовка к звонкам'},
+      {cmd: '/AIM-content-voice', text: 'Content voice — вычитка follow-up партнёрам'},
+      {cmd: '/AIM-luma-space-session', text: 'Luma — создание FOS сессий, Space events'},
+      {cmd: '/AIM-space-new-members', text: 'New members — четверговые анонсы в Space'},
       {cmd: '/research', text: 'Research — поиск партнёров и конкурентов через Exa'},
-      {cmd: '/content-voice', text: 'Content voice — вычитка follow-up сообщений партнёрам'},
-      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — после partnership call'},
       {cmd: '/calendar', text: 'Calendar — расписание встреч'},
-      {cmd: 'ls ai-mindset-2026/Org/Partners/', text: 'CRM папка партнёров'},
-      {cmd: '/daily-focus', text: 'Daily focus — фокус дня в Telegram'},
     ]
   },
   tech: {
@@ -1832,26 +1955,26 @@ const ROLES = {
   content: {
     name: 'Katya', title: 'Content & Marketing Lead', icon: '◎',
     desc: 'Контент, reels, stories, карусели, analytics, стиль',
-    skills: ['AIM-carousel','imagine','content-voice','AIM-meeting-summary','daily-focus','infocompressor','research'],
+    skills: ['AIM-carousel','AIM-visual','AIM-content-calendar','AIM-imagine','content-voice','AIM-bio','infocompressor'],
     walkthrough: [
       {cmd: '/AIM-carousel', text: 'Carousel generator — 7 стилей, Stories + Posts'},
-      {cmd: '/imagine', text: 'Image generation — 4 модели (Nano Banana, GPT-5, Flux, Seedream)'},
+      {cmd: '/AIM-visual', text: 'Visual system — covers, cards, OG, SVG diagrams'},
+      {cmd: '/AIM-content-calendar', text: 'Content calendar — план недели, pipeline stats'},
+      {cmd: '/AIM-imagine', text: 'Image generation — Brand Bible style через OpenRouter'},
       {cmd: '/content-voice', text: 'Content voice — проверка текстов на AI-шность'},
-      {cmd: '/infocompressor', text: 'Compress — сжатие текстов 3-5x без потери данных'},
-      {cmd: '/daily-focus', text: 'Daily focus — фокус дня + визуальная метафора'},
-      {cmd: '/research', text: 'Research — поиск контент-идей и трендов'},
+      {cmd: '/AIM-bio', text: 'Bio links — управление bio.aimindset.org'},
     ]
   },
   pm: {
     name: 'Karina', title: 'Program Coordinator', icon: '◉',
     desc: 'Sprint launches, speakers, events, сайт, координация',
-    skills: ['AIM-lab','AIM-pm','calendar','linear-action','AIM-meeting-summary','AIM-lab-announce','research'],
+    skills: ['AIM-lab','AIM-pm','calendar','linear-action','AIM-lab-closing','AIM-luma-space-session','AIM-curator'],
     walkthrough: [
       {cmd: '/AIM-lab', text: 'Lab hub — чат лаборатории, участники, дайджест'},
       {cmd: '/AIM-pm', text: 'Team PM — статус задач команды'},
-      {cmd: '/linear-action', text: 'Linear — обновление задач спринта'},
-      {cmd: '/AIM-lab-announce', text: 'Lab announce — анонсы в чат лаборатории'},
-      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — итоги звонков'},
+      {cmd: '/AIM-lab-closing', text: 'Lab closing — 5-дневная последовательность завершения'},
+      {cmd: '/AIM-luma-space-session', text: 'Luma — создание FOS сессий + Calendar + TG'},
+      {cmd: '/AIM-curator', text: 'Curator — outreach, onboarding кураторов'},
       {cmd: '/calendar', text: 'Calendar — расписание сессий и дедлайнов'},
     ]
   },
@@ -1866,6 +1989,19 @@ const ROLES = {
       {cmd: '/content-voice', text: 'Content voice — проверка тона сообщений'},
       {cmd: '/calendar', text: 'Calendar — расписание community events'},
       {cmd: '/daily-focus', text: 'Daily focus — фокус на community задачи'},
+    ]
+  },
+  assistant: {
+    name: 'Elena', title: 'Business Assistant', icon: '▫',
+    desc: 'Personal ops, AIM speaker comms, launch operations, admin',
+    skills: ['calendar','pos-morning','AIM-meeting-summary','linear-action','AIM-weekly-sync','daily-focus','sessions'],
+    walkthrough: [
+      {cmd: '/calendar', text: 'Calendar — расписание Alex и команды'},
+      {cmd: '/pos-morning', text: 'Morning brief — контекст дня'},
+      {cmd: '/AIM-meeting-summary', text: 'Meeting summary — итоги звонков → action items'},
+      {cmd: '/AIM-weekly-sync', text: 'Weekly sync — генерация повестки из Linear + calendar'},
+      {cmd: '/linear-action', text: 'Linear — трекинг задач'},
+      {cmd: '/daily-focus', text: 'Daily focus — планирование дня'},
     ]
   }
 };
