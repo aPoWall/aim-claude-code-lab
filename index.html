@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Claude Code Lab — AI Mindset</title>
   <meta property="og:title" content="Claude Code Lab — AI Mindset">
   <meta property="og:description" content="Интерактивный курс Claude Code с живым терминалом">
@@ -74,6 +75,9 @@
     .term-size{font-size:0.6rem;color:var(--text-label);opacity:0.5}
     .term-body{height:460px;padding:4px}
     .term-body-large{height:600px}
+    /* Block password autofill overlays */
+    .term-wrapper form{margin:0;padding:0}
+    .xterm-helper-textarea{-webkit-text-security:none !important}
 
     /* XTERM OVERRIDES */
     .xterm{padding:8px}
@@ -237,7 +241,9 @@
         <span class="term-title">claude code lab &mdash; ~/ai-mindset</span>
         <span class="term-size" id="termSize"></span>
       </div>
-      <div class="term-body term-body-large" id="mainTerminal"></div>
+      <form autocomplete="off" data-1p-ignore data-lpignore="true" style="margin:0;padding:0" onsubmit="return false">
+        <div class="term-body term-body-large" id="mainTerminal"></div>
+      </form>
     </div>
     <div class="launch-bar">
       <div class="launch-bar-text">
